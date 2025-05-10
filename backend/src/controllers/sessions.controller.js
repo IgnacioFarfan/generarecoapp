@@ -84,7 +84,11 @@ export default class ProductsController {
                     code: TErrors.NOT_FOUND
                 });
             }
-            let userSessions = await this.sessionsRepo.getUserSessions(uid);
+            
+            // Get the last 3 sessions for this user
+            let userSessions = await this.sessionsRepo.getUserSessions(uid, 3);
+            
+            
             res.status(200).send(userSessions);
         } catch (error) {
             next(error)

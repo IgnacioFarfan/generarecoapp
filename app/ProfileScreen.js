@@ -180,10 +180,10 @@ const ProfileScreen = () => {
           
           console.log('Sessions array:', JSON.stringify(sessionsArray));
           
-          // Take the most recent 3 sessions and reverse them (newest first)
-          const recentSessions = sessionsArray.slice(-3).reverse();
+          // Sessions are already sorted newest first from the backend
+          // Just take the first 3 (most recent)
+          const recentSessions = sessionsArray.slice(0, 3);
           
-          // Log the sessions we're actually going to display
           console.log('Recent sessions to display:', JSON.stringify(recentSessions));
           
           setLastRuns(recentSessions);
