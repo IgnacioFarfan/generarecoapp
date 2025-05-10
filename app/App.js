@@ -98,15 +98,9 @@ export default function App() {
       setError(''); // Clear previous errors
       setIsLoading(true);
       
-      // Log the exact URL we're trying to access
-      const loginUrl = `${apiConfig.localApiUrl}${apiConfig.endpoints.login}`;
-      console.log('Attempting direct login to:', loginUrl);
-      
-      // Try a direct axios call instead of using the service
-      const response = await axios.post(loginUrl, { 
-        email: username, 
-        password: password 
-      });
+      // Use the apiService instead of direct axios call
+      console.log('Attempting login with apiService');
+      const response = await apiService.login(username, password);
       
       console.log('Login response:', response.data);
       
