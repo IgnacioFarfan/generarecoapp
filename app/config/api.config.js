@@ -3,9 +3,9 @@ import { Platform } from 'react-native';
 // Environment-specific API configuration
 const ENV = {
   dev: {
-    // Local development URL (for iOS simulator and dev client)
-    localUrl: 'http://181.87.233.45:5000',
-    // Public URL (for standalone builds and Android)
+    // Local development URL (Android Emulator)
+    localUrl: 'http://10.0.2.2:5000',
+    // Public URL (for standalone builds)
     publicUrl: 'http://181.87.233.45:5000',
   },
   staging: {
