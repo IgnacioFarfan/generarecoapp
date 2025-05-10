@@ -313,6 +313,22 @@ const ProfileScreen = () => {
     }
   };
 
+  // Add this function near your other handler functions
+  const handleLogout = async () => {
+    try {
+      // Clear the stored token
+      await AsyncStorage.removeItem('userToken');
+      // Navigate to Login screen
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      console.error('Error logging out:', error);
+      Alert.alert('Error', 'No se pudo cerrar la sesión.');
+    }
+  };
+
   return (
     <ImageBackground
       source={isProfileVisible ? require('./assets/fondo3.jpg') : require('./assets/fondo4.jpg')}
@@ -484,9 +500,17 @@ const ProfileScreen = () => {
             <Text style={styles.info}>Kilómetros recorridos: {kilometers.toFixed(2)} km</Text>
             <Text style={styles.info}>Rango: {userData.range || range}</Text>
             <Text style={styles.info}>Experiencia: {userData.experience || 'Principiante'}</Text>
+            
+            {/* Back button */}
             <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
               <Icon name="arrow-back" size={30} color="black" />
               <Text style={styles.backButtonText}>Regresar</Text>
+            </TouchableOpacity>
+            
+            {/* Logout button */}
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Icon name="log-out" size={30} color="white" />
+              <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -702,6 +726,20 @@ const styles = StyleSheet.create({
     color: 'white', // Changed from #555 to white for better visibility on transparent background
     fontSize: 14,
     paddingHorizontal: 10,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#d9534f',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 15,
+  },
+  logoutButtonText: {
+    fontSize: 16,
+    color: 'white',
+    marginLeft: 5,
+    fontWeight: 'bold',
   },
 });
 
