@@ -241,17 +241,27 @@ const ProfileScreen = () => {
     item._id || item.date || `run-${index}`, []);
 
   // Create a memoized render item function
-  const renderRunItem = useCallback(({ item }) => (
-    <View style={styles.runItem}>
-      <Text style={styles.runText}>
-        Fecha: {moment(item.date || item.createdAt).format('YYYY-MM-DD HH:mm:ss')}
-      </Text>
-      <Text style={styles.runText}>Kilómetros: {item.kilometers || item.distance} km</Text>
-      {item.speedAvg && (
-        <Text style={styles.runText}>Velocidad: {item.speedAvg.toFixed(2)} km/h</Text>
-      )}
-    </View>
-  ), []); // Empty dependency array means this function won't change
+  const renderRunItem = useCallback(({ item }) => {
+    // Ensure all values are properly formatted before rendering
+    const formattedDate = item.date || item.createdAt ? 
+      moment(item.date || item.createdAt).format('YYYY-MM-DD HH:mm:ss') : 'N/A';
+    const distance = (item.kilometers || item.distance || 0).toString();
+    const speed = item.speedAvg ? item.speedAvg.toFixed(2) : 'N/A';
+    
+    return (
+      <View style={styles.runItem}>
+        <Text style={styles.runText}>
+          Fecha: {formattedDate}
+        </Text>
+        <Text style={styles.runText}>
+          Kilómetros: {distance} km
+        </Text>
+        <Text style={styles.runText}>
+          Velocidad: {speed} km/h
+        </Text>
+      </View>
+    );
+  }, []); // Empty dependency array means this function won't change
 
   // Create a memoized chart data function to prevent unnecessary recalculations
   const getChartData = useCallback(() => {
