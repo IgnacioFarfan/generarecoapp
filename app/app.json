@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "jsEngine": "hermes",
+    "name": "generareco",
+    "slug": "react-native-fitness-app",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/test.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.generareco",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyByXzOFHHWOV0HF211ViwnDPv3JpvRpBkw"
+        }
+      },
+      "allowBackup": true,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "intentFilters": [],
+      "usesCleartextTraffic": true
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "kotlin": {
+        "version": "21.0.0"
+      },
+      "eas": {
+        "projectId": "0056f2b6-5d55-4eb5-a39d-a4d409381906"
+      }
+    },
+    "owner": "yosoynacho"
+  }
+}
