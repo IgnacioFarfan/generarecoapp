@@ -173,11 +173,20 @@ const ProfileScreen = () => {
         const sessionsResponse = await apiService.getUserSessions(userId);
         
         if (sessionsResponse.data) {
+          // Ensure we have an array of sessions
           const sessionsArray = Array.isArray(sessionsResponse.data) ? 
                               sessionsResponse.data : 
                               [sessionsResponse.data];
           
-          setLastRuns(sessionsArray.slice(-3).reverse());
+          console.log('Sessions array:', JSON.stringify(sessionsArray));
+          
+          // Take the most recent 3 sessions and reverse them (newest first)
+          const recentSessions = sessionsArray.slice(-3).reverse();
+          
+          // Log the sessions we're actually going to display
+          console.log('Recent sessions to display:', JSON.stringify(recentSessions));
+          
+          setLastRuns(recentSessions);
         }
       } catch (sessionError) {
         console.error('Error fetching sessions:', sessionError);
@@ -242,11 +251,22 @@ const ProfileScreen = () => {
 
   // Create a memoized render item function
   const renderRunItem = useCallback(({ item }) => {
-    // Ensure all values are properly formatted before rendering
-    const formattedDate = item.date || item.createdAt ? 
-      moment(item.date || item.createdAt).format('YYYY-MM-DD HH:mm:ss') : 'N/A';
-    const distance = (item.kilometers || item.distance || 0).toString();
-    const speed = item.speedAvg ? item.speedAvg.toFixed(2) : 'N/A';
+    console.log('Rendering session item:', JSON.stringify(item));
+    
+    // Format the date - the sessionDate is definitely in the data
+    let formattedDate = 'N/A';
+    try {
+      if (item.sessionDate) {
+        formattedDate = moment(new Date(item.sessionDate)).format('YYYY-MM-DD HH:mm');
+        console.log('Formatted date:', formattedDate, 'from:', item.sessionDate);
+      }
+    } catch (e) {
+      console.error('Error formatting date:', e, 'for date value:', item.sessionDate);
+    }
+    
+    // Format distance and speed
+    const distance = parseFloat(item.distance) || 0;
+    const speed = parseFloat(item.speedAvg) || 0;
     
     return (
       <View style={styles.runItem}>
@@ -254,14 +274,15 @@ const ProfileScreen = () => {
           Fecha: {formattedDate}
         </Text>
         <Text style={styles.runText}>
-          Kilómetros: {distance} km
+          Kilómetros: {distance.toFixed(2)} km
         </Text>
         <Text style={styles.runText}>
-          Velocidad: {speed} km/h
+          Velocidad: {speed.toFixed(2)} km/h
         </Text>
       </View>
     );
   }, []); // Empty dependency array means this function won't change
+
 
   // Create a memoized chart data function to prevent unnecessary recalculations
   const getChartData = useCallback(() => {
