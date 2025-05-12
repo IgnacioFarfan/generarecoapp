@@ -170,6 +170,25 @@ const apiService = {
     }
   },
   
+  register: async (userData) => {
+    try {
+      console.log('Register payload:', userData);
+      
+      const response = await apiService.retryRequest(
+        () => apiClient.post(apiConfig.endpoints.register, userData),
+        3 // max retries
+      );
+      
+      return response;
+    } catch (error) {
+      console.error('Register error details:', error);
+      throw handleApiError(error);
+    }
+  },
+  
+  // Expose the URL checking function
+  checkApiUrls: checkApiUrls,
+  
   getUser: async () => {
     try {
       const response = await apiClient.get(apiConfig.endpoints.getUser);

@@ -177,17 +177,17 @@ export default function App() {
       setError(''); // Clear previous errors
       setIsLoading(true);
       
-      // Log the exact URL we're trying to access
-      const signupUrl = `${apiConfig.localApiUrl}${apiConfig.endpoints.register}`;
-      console.log('Attempting signup to:', signupUrl);
+      console.log('Attempting signup with apiService');
       
-      // Try a direct axios call instead of using the service
-      const response = await axios.post(signupUrl, { 
+      // Use apiService instead of direct axios call to leverage URL fallback
+      const response = await axios.post(`${apiConfig.endpoints.register}`, { 
         username,
         password,
         firstName,
         lastName,
         email
+      }, {
+        baseURL: await apiService.checkApiUrls() // Use the URL checking mechanism
       });
       
       console.log('Signup response:', response.data);

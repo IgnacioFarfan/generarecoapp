@@ -6,7 +6,7 @@ const ENV = {
     // Local development URL (Android Emulator)
     localUrl: 'http://10.0.2.2:5000',
     // Public URL (for standalone builds)
-    publicUrl: 'http://181.87.233.45:5000',
+    publicUrl: 'https://geapp-rwxm.onrender.com',
   },
   staging: {
     localUrl: 'https://staging-api.generareco.com',
