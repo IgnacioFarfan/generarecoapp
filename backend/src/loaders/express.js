@@ -3,18 +3,18 @@ import indexRoute from "../routes/index.route.js";
 import passport from "passport";
 import initializePassport from "../config/passport.config.js";
 import __dirname from "../tools/utils.js";
-import cors from "cors";
+//import cors from "cors";
 import session from "express-session";
 import { profilesImgPath } from "../public/data/pathProfiles.js";
 import usersGoalsRouter from "../routes/usersGoals.route.js";
-
-const corsOptions = {
-    origin: "https://localhost:8080",
-    credentials: true,
-};
+ 
+/* const corsOptions = {
+    origin: "http://10.0.2.2:8081",
+    credentials: true
+}; */
 
 export default async function appLoader(app) {
-    app.use(cors(corsOptions));
+    //app.use(cors(corsOptions));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(express.static(__dirname + "/public"));

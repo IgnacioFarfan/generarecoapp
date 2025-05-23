@@ -17,8 +17,7 @@ const userSchema = new mongoose.Schema({
     height: Number,
     weight: Number,
     age: Number,
-    gender: { type: String, enum: ['Male', 'Female', 'Other'], default: null },
-    experience: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' },
+    gender: { type: String, enum: ['Masculino', 'Femenino', 'Otro'], default: null },
     avatar: { type: String, default: "https://localhost:8080/public/data/userguest3.png" },
     country: String,
     totalKilometers: { type: Number, default: 0 }

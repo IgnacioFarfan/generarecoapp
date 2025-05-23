@@ -21,6 +21,7 @@ router.get("/google", isSessionOn(), passportCall("google"), handlePolicies(["PU
 router.get("/gstrategy", isSessionOn(), passportCall("google"), handlePolicies(["PUBLIC"]), usersController.googleStrategy);
 router.put("/avatar/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), uploads.single("avatar"), usersController.updateUserAvatar);
 router.get("/getusers", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getAllUsers);
+router.get("/getuser/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getUser);
 router.put("/updateuserstatus/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserStatus);
 router.put("/updateuser", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUser);
 
