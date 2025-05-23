@@ -28,7 +28,7 @@ export default class UsersController {
     getUser = async (req, res, next) => {
         const { uid } = req.params;
         try {
-            const user = await this.usersRepo.getUserById(uid);
+            const user = await this.usersRepo.getUserById(uid);            
             if (!user) {
                 CustomError.createError({
                     message: `Usuario ID ${uid} no encontrado.`,
@@ -132,7 +132,8 @@ export default class UsersController {
     }
 
     updateUser = async (req, res, next) => {
-        const { uid } = req.body;
+        const { uid, age, experience, gender, height, weight } = req.body;
+        
         try {
             // Only require the user ID for updates
             if (!uid) {
@@ -153,8 +154,8 @@ export default class UsersController {
             // Create an update object with only the fields that were provided
             const updateFields = {};
             const allowedFields = ['userName', 'firstName', 'lastName', 'email', 
-                                  'range', 'height', 'weight', 'age', 'country', 
-                                  'gender', 'experience'];
+                                    'range', 'height', 'weight', 'age', 'country', 
+                                    'gender', 'experience'];
             
             allowedFields.forEach(field => {
                 if (req.body[field] !== undefined) {

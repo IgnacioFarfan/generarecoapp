@@ -4,62 +4,14 @@ import apiConfig from '../config/api.config';
 import { jwtDecode } from 'jwt-decode';
 
 // Create axios instance with base URL
-// We'll set the baseURL dynamically for each request
 const apiClient = axios.create({
-  timeout: 15000, // Increased timeout to 15 seconds
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: "aquí el ip local o api"
 });
-
-// Track which URL is currently working
-let currentApiUrl = null;
-let isCheckingUrls = false;
-
-// Function to check which API URL is accessible
-const checkApiUrls = async () => {
-  if (isCheckingUrls) return currentApiUrl || apiConfig.publicApiUrl;
-  
-  isCheckingUrls = true;
-  
-  try {
-    // Try local URL first
-    console.log('Trying local API URL:', apiConfig.localApiUrl);
-    await axios.get(`${apiConfig.localApiUrl}/api`, { timeout: 3000 });
-    console.log('Local API URL is accessible');
-    currentApiUrl = apiConfig.localApiUrl;
-  } catch (localError) {
-    console.log('Local API URL failed:', localError.message);
-    
-    try {
-      // Try public URL as fallback
-      console.log('Trying public API URL:', apiConfig.publicApiUrl);
-      await axios.get(`${apiConfig.publicApiUrl}/api`, { timeout: 3000 });
-      console.log('Public API URL is accessible');
-      currentApiUrl = apiConfig.publicApiUrl;
-    } catch (publicError) {
-      console.log('Public API URL failed:', publicError.message);
-      // If both fail, default to public URL
-      currentApiUrl = apiConfig.publicApiUrl;
-    }
-  }
-  
-  isCheckingUrls = false;
-  return currentApiUrl;
-};
 
 // Add request interceptor to include auth token and set the correct baseURL
 apiClient.interceptors.request.use(
   async (config) => {
-    try {
-      // Get the working API URL
-      if (!currentApiUrl) {
-        currentApiUrl = await checkApiUrls();
-      }
-      
-      // Set the baseURL for this request
-      config.baseURL = currentApiUrl;
-      
+    try {      
       const token = await AsyncStorage.getItem('userToken');
       if (token) {
         // Check if token is expired
@@ -91,33 +43,18 @@ apiClient.interceptors.request.use(
 
 // Add response interceptor for better error handling
 apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  async (error) => {
-    // If the request failed due to network issues, try the other URL
-    if (error.message === 'Network Error' || error.code === 'ECONNABORTED') {
-      console.log('Network error detected, trying alternative URL');
-      
-      // Switch to the other URL
-      currentApiUrl = currentApiUrl === apiConfig.localApiUrl 
-        ? apiConfig.publicApiUrl 
-        : apiConfig.localApiUrl;
-      
-      // Retry the request with the new URL
-      const originalRequest = error.config;
-      originalRequest.baseURL = currentApiUrl;
-      
-      try {
-        return await axios(originalRequest);
-      } catch (retryError) {
-        console.log('Retry with alternative URL also failed');
-        return Promise.reject(retryError);
-      }
+  response => response,
+    error => {
+        if (error.response) {
+            console.error('Server Error:', error.response.data);
+        } else if (error.request) {
+            console.error('No Response:', error.request);
+        } else {
+            console.error('Error:', error.message);
+        }
+
+        return Promise.reject(error);
     }
-    
-    return Promise.reject(error);
-  }
 );
 
 // Helper function to handle API errors
@@ -127,7 +64,7 @@ const handleApiError = (error) => {
     return {
       error: true,
       status: 0,
-      message: 'Cannot connect to server. Please check your internet connection.',
+      message: 'No se pudo conectar al servidor. Por favor, verifica tu conexión a internet.',
       originalError: error
     };
   }
@@ -146,14 +83,11 @@ const apiService = {
   login: async (email, password) => {
     try {
       // Log the full URL being requested
-      console.log('Login URL:', `${apiConfig.apiUrl}${apiConfig.endpoints.login}`);
+      console.log('Login URL:', `http://192.168.100.48:5000/api${apiConfig.endpoints.login}`);
       console.log('Login payload:', { email, password });
       
-      const response = await apiService.retryRequest(
-        () => apiClient.post(apiConfig.endpoints.login, { email, password }),
-        3 // max retries
-      );
-      
+      const response = await apiClient.post(apiConfig.endpoints.login, { email, password })
+
       // Save the user ID from the response
       if (response.data && response.data.user && response.data.user._id) {
         await AsyncStorage.setItem('userId', response.data.user._id);
@@ -165,48 +99,47 @@ const apiService = {
       
       return response;
     } catch (error) {
-      console.error('Login error details:', error);
       throw handleApiError(error);
     }
   },
-  
-  register: async (userData) => {
+
+  signup: async (username, password, firstName, lastName, email) => {
     try {
-      console.log('Register payload:', userData);
+      // Log the full URL being requested
+      console.log('Register URL:', apiConfig.endpoints.register);
+      console.log('Register payload:', { username, password, firstName, lastName, email });
       
-      const response = await apiService.retryRequest(
-        () => apiClient.post(apiConfig.endpoints.register, userData),
-        3 // max retries
-      );
+      const response = await apiClient.post(apiConfig.endpoints.register, { username, password, firstName, lastName, email })
+      
+
+      // Save the user ID from the response
+      if (response.data && response.data.user && response.data.user._id) {
+        await AsyncStorage.setItem('userId', response.data.user._id);
+        console.log('User ID saved:', response.data.user._id);
+      } else if (response.data && response.data._id) {
+        await AsyncStorage.setItem('userId', response.data._id);
+        console.log('User ID saved:', response.data._id);
+      }
       
       return response;
     } catch (error) {
-      console.error('Register error details:', error);
+      throw handleApiError(error);
+    }
+  },
+
+  getUser: async (userId) => {
+    try {
+      const response = await apiClient.get(apiConfig.endpoints.getUser(userId));
+      
+      return response;
+    } catch (error) {
       throw handleApiError(error);
     }
   },
   
-  // Expose the URL checking function
-  checkApiUrls: checkApiUrls,
-  
-  getUser: async () => {
+  getUsers: async () => {
     try {
-      const response = await apiClient.get(apiConfig.endpoints.getUser);
-      
-      // Save the user ID from the response
-      if (response.data) {
-        let userId;
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          userId = response.data[0]._id;
-        } else if (response.data._id) {
-          userId = response.data._id;
-        }
-        
-        if (userId) {
-          await AsyncStorage.setItem('userId', userId);
-          console.log('User ID saved from getUser:', userId);
-        }
-      }
+      const response = await apiClient.get(apiConfig.endpoints.getUsers);
       
       return response;
     } catch (error) {
@@ -362,57 +295,9 @@ const apiService = {
     }
   },
   
-  getUserGoals: async () => {
+  getUserGoals: async (userId) => {
     try {
-      // First try to get userId from AsyncStorage
-      let userId = await AsyncStorage.getItem('userId');
-      
-      // If not found, try to get it from the user token
-      if (!userId) {
-        console.log('User ID not found in AsyncStorage, trying to get from token');
-        const token = await AsyncStorage.getItem('userToken');
-        
-        if (token) {
-          try {
-            const decoded = jwtDecode(token);
-            userId = decoded.id || decoded._id || decoded.userId;
-            
-            if (userId) {
-              // Save it for future use
-              await AsyncStorage.setItem('userId', userId);
-              console.log('User ID extracted from token and saved:', userId);
-            }
-          } catch (decodeError) {
-            console.error('Error decoding token to get user ID:', decodeError);
-          }
-        }
-      }
-      
-      if (!userId) {
-        // If still not found, try to get it from the user API
-        console.log('Trying to get user ID from user API');
-        const userResponse = await apiClient.get(apiConfig.endpoints.getUser);
-        
-        if (userResponse.data) {
-          if (Array.isArray(userResponse.data) && userResponse.data.length > 0) {
-            userId = userResponse.data[0]._id;
-          } else if (userResponse.data._id) {
-            userId = userResponse.data._id;
-          }
-          
-          if (userId) {
-            await AsyncStorage.setItem('userId', userId);
-            console.log('User ID from API saved:', userId);
-          }
-        }
-      }
-      
-      if (!userId) {
-        throw new Error('User ID not found');
-      }
-      
-      console.log('Getting goals for user ID:', userId);
-      const response = await apiClient.get(`/api/usersgoals/getusergoals/${userId}`);
+      const response = await apiClient.get(apiConfig.endpoints.getUserGoals(userId));
       return response;
     } catch (error) {
       console.error('Error getting user goals:', error);

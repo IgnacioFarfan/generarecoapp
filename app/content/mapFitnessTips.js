@@ -1,0 +1,7 @@
+export const tips = [
+    "Para tener suficiente energía, es recomendable incorporar hidratos de carbono que aporten energía rápida en tu comida anterior al entrenamiento. Algunas opciones pueden ser: avena, arroz, pan, fruta, pasta, etc.",
+    "Si tu entrenamiento es mayor a 75 minutos, puedes llevar alguna opción con hidratos de carbono para mantener tu energía, reservar tu glucógeno y, de esta forma, proteger la masa muscular. Por ejemplo: 1 banana, 1 bebida deportiva casera, un puñado pequeño de pasas de uva, bolitas de arroz, etc. Es importante que no contengan grasas, proteínas ni fibras para no generar malestar digestivo. Esto se repite si tu entrenamiento es mayor a 120 minutos.",
+    "Mantén una hidratación adecuada, aproximadamente 500 cc por hora. Esto puede variar de acuerdo al clima y al tamaño corporal de cada deportista.",
+    "Para acompañar tu actividad deportiva, elige frutas y verduras locales y de temporada. Estas no solo son más frescas, sino que también reducen la huella de carbono.",
+    "Recuerda que el ejercicio y la alimentación adecuada están relacionados con la prevención y la disminución del riesgo de cualquier tipo de enfermedad relacionada con el envejecimiento. Está en nuestros hábitos el secreto para mantenernos jóvenes, saludables y fuertes."
+];

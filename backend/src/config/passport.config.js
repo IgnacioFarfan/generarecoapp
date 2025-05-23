@@ -3,7 +3,7 @@ import passport from "passport";
 import local from "passport-local";
 import { createHash, isValidPass } from "../tools/utils.js";
 import GoogleStrategy from "passport-google-oauth20";
-import mailer from "../tools/mailer.js";
+//import mailer from "../tools/mailer.js";
 import moment from 'moment';
 
 const localStrategy = local.Strategy;
@@ -102,7 +102,7 @@ const initializePassport = () => {
                     password: createHash(password)
                 });
 
-                await mailer({ mail: email, name: firstName }, `Bienvenido!`)
+                //await mailer({ mail: email, name: firstName }, `Bienvenido!`)
                 return done(null, newUser);
             } catch (error) {
                 return done(error, null);
