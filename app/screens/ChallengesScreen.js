@@ -1,122 +1,121 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Alert, TouchableOpacity, ImageBackground, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import apiService from '../services/api.service';
-import { challengeLevels } from '../content/challengesLevels';
 import { challengesStyles } from '../styles/challengesStyles'
 import { getUserTokenAndId } from '../tools/getUserTokenAndId';
+import FooterScreen from './FooterScreen';
+import { iconMap } from '../content/challengesIconMap';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const ChallengesScreen = ({ route }) => {
+
+const ChallengesScreen = () => {
   const navigation = useNavigation();
-  const [activeLevel, setActiveLevel] = useState('beginner');
+
   const [userGoals, setUserGoals] = useState([]);
-  const [kilometers, setKilometers] = useState(0);
+
+  const [progress, setProgress] = useState(0);
+  const [distance, setDistance] = useState(0);
+  const [time, setTime] = useState(0);
+  const [speedAvg, setSpeedAvg] = useState(0);
+
+  const [uid, setUid] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedChallenge, setSelectedChallenge] = useState(null);
-  const [completedChallenges, setCompletedChallenges] = useState([]);
 
   useEffect(() => {
-    fetchUserGoals();
-    loadKilometers();
-    loadCompletedChallenges();
+    async function fetchUserId() {
+      const { userId } = await getUserTokenAndId(navigation);
+      fetchUserGoal(userId)
+      setUid(userId)
+    }
+    fetchUserId()
   }, []);
 
-  const fetchUserGoals = async () => {
+  async function fetchUserGoal(userId) {
+    setLoading(true);
     try {
-      setLoading(true);
+      // trae los desafíos del usuario con campos de estado para poder renderizar en el front status: 
+      // "locked", "unlocked", "in_progress", "completed"
+      // El usuario no podrá suscribirse a más de un desafío a la vez
+      const response = await apiService.getGoalsWithStatus(userId);
+      console.log('user goals:', response.data);
 
-      const { userId } = await getUserTokenAndId(navigation);
+      if (response && response.data) setUserGoals(response.data);
 
-      const response = await apiService.getUserGoals(userId);
-      if (response && response.data && response.data.data) {
-        setUserGoals(response.data.data);
+      if (response.data.length > 0) {
+        response.data.forEach(async ug => {
 
-        // Check for completed challenges
-        const completed = [];
-        response.data.data.forEach(userGoal => {
-          if (userGoal.completed || userGoal.progress >= 100) {
-            // Extract challenge ID from goal identifier
-            if (userGoal.goal && userGoal.goal.identifier) {
-              completed.push(userGoal.goal.identifier);
+          if (ug.status === 'in_progress') {
+            // trae el progreso en porcentaje, distancia total y velocidad. Tomando las sesiones desde 
+            // la fecha de inicio de la meta hasta el momento
+            const userGoalStats = await apiService.getUserGoalsStats(userId, ug._id);
+            console.log(userGoalStats.data);
+
+            if (userGoalStats && typeof userGoalStats === 'object') {
+              setProgress(userGoalStats.data.progressPercent);
+              setDistance(userGoalStats.data.totalDistance);
+              setSpeedAvg(userGoalStats.data.avgSpeed);
+              setTime(userGoalStats.data.totalTime);
+            }
+
+            if (userGoalStats.data.progressPercent >= 100) {
+              const date = new Date().toISOString()
+              //actualizo el userGoal como terminado añadiendo la fecha al campo Finnish que en principio está nulo
+              const finnishChallenge = await apiService.updateFinnishUserGoal(userId, ug._id, date);
+              console.log(finnishChallenge.data);
+              if (finnishChallenge.data) {
+
+
+                Alert.alert(
+                  'Felicitaciones!',
+                  'Completaste tu meta! Nuevos desafíos te esperan!',
+                  [{ text: 'Aceptar', onPress: () => fetchUserGoal(uid) }]
+                );
+
+              }
             }
           }
         });
-
-        setCompletedChallenges(completed);
-        await AsyncStorage.setItem('completedChallenges', JSON.stringify(completed));
       }
     } catch (err) {
       console.error('Error fetching user goals:', err);
-      setError('No se pudieron cargar los desafíos');
+      setError('No se pudieron cargar los desafíos. Vuelvea intentarlo más tarde.');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const loadKilometers = async () => {
-    try {
-      const storedKilometers = await AsyncStorage.getItem('kilometers');
-      if (storedKilometers) {
-        setKilometers(parseInt(storedKilometers, 10) || 0);
-      }
-    } catch (err) {
-      console.error('Error loading kilometers:', err);
-    }
-  };
-
-  const loadCompletedChallenges = async () => {
-    try {
-      const stored = await AsyncStorage.getItem('completedChallenges');
-      if (stored) {
-        setCompletedChallenges(JSON.parse(stored));
-      }
-    } catch (err) {
-      console.error('Error loading completed challenges:', err);
-    }
-  };
-
-  const startChallenge = async (challenge) => {
+  const startChallenge = async (gid) => {
     try {
       setLoading(true);
+      //retorna true si existe esa meta o false caso contrario. El usuario no debería tener más de una meta en curso.
+      const userGoalExist = await apiService.checkUserGoalExist(uid, gid);
 
-      // Crear un objeto de meta con valores predeterminados para evitar nulos
-      const goalData = {
-        // Asegurarse de que distance siempre tenga un valor positivo
-        distance: challenge.goal.distance || 1, // Valor mínimo de 1 si no hay distancia
-        speedAvg: challenge.goal.speedAvg || null,
-        time: challenge.goal.time || null,
-        challengeId: challenge.id // Store the challenge ID
-      };
+      if (userGoalExist.data) {
+        Alert.alert(
+          '¡Atención!',
+          'Ya tienes un desafío en curso',
+          [{ text: 'Aceptar' }]
+        );
+        return
+      }
 
-      // Guardar la meta en el servidor
-      const response = await apiService.saveGoal(goalData);
+      const response = await apiService.saveUserGoal(uid, gid);
 
       if (response && response.data && response.data._id) {
         console.log('Meta guardada con éxito, ID:', response.data._id);
 
-        // Asociar la meta con el usuario
-        const assignResponse = await apiService.assignGoalToUser(response.data._id);
-        console.log('Meta asignada al usuario:', assignResponse.data);
-
-        // Actualizar estado local
-        setSelectedChallenge(challenge.id);
-        await AsyncStorage.setItem('selectedChallenge', challenge.id);
-
         Alert.alert(
           '¡Desafío iniciado!',
           'Has comenzado un nuevo desafío. ¡Buena suerte!',
-          [{ text: 'Comenzar', onPress: () => navigation.navigate('Map') }]
+          [{ text: 'Comenzar', onPress: () => handleStartChallenge() }]
         );
-      } else {
-        throw new Error('No se recibió un ID de meta válido del servidor');
       }
     } catch (err) {
       console.error('Error starting challenge:', err);
 
-      // Mostrar mensaje de error más específico
       let errorMessage = 'No se pudo iniciar el desafío. Inténtalo de nuevo.';
 
       if (err.status === 500) {
@@ -131,194 +130,177 @@ const ChallengesScreen = ({ route }) => {
     }
   };
 
-  const getProgress = (challenge) => {
-    // Find if user has this goal
-    const userGoal = userGoals.find(ug =>
-      ug.goal && ug.goal.identifier === challenge.id
-    );
+  const handleStartChallenge = async () => {
+    fetchUserGoal(uid)
+    navigation.navigate('Map')
+  }
 
-    if (!userGoal) return 0;
-
-    // Use the progress calculated by the backend
-    return userGoal.progress || 0;
-  };
-
-  const getCurrentChallenge = () => {
-    const challenges = challengeLevels[activeLevel].challenges;
-
-    // If no challenges completed, return the first one
-    if (completedChallenges.length === 0) {
-      return challenges[0];
+  const confirmDeleteUserGoal = async (gid) => {
+    try {
+      Alert.alert(
+        '¡Atención!',
+        'Seguro quieres eliminar tu desafío?',
+        [
+          { text: 'Aceptar', onPress: () => deleteUserGoal(gid) },
+          { text: 'Cancelar' }
+        ]
+      );
+    } catch (err) {
+      console.error('Error fetching user goals:', err);
     }
+  }
 
-    // Find the first challenge that isn't completed
-    for (let i = 0; i < challenges.length; i++) {
-      if (!completedChallenges.includes(challenges[i].id)) {
-        return challenges[i];
-      }
+  const deleteUserGoal = async (gid) => {
+    setLoading(true);
+    try {
+      // borra el desafío con el id del modelo Goals y el id de usuario para que le usuario pueda abandonar el desafío en cualquier momento
+      const response = await apiService.deleteUserGoal(uid, gid);
+      console.log('user goal deleted:', response.data);
+
+      if (response && response.status === 200) fetchUserGoal(uid);
+
+    } catch (err) {
+      console.error('Error fetching user goals:', err);
+      setError('No se pudieron cargar los desafíos');
+    } finally {
+      setLoading(false);
     }
+  }
 
-    // If all challenges are completed, return the last one
-    return challenges[challenges.length - 1];
-  };
-
-  // Navigation handlers
-    const handleProfilePress = () => {
-        navigation.navigate('Profile');
-    };
-
-    const handleMapPress = () => {
-        navigation.navigate('Map');
-    };
-
-  const renderCurrentChallenge = () => {
-    const challenge = getCurrentChallenge();
-    const progress = getProgress(challenge);
-    const isSelected = selectedChallenge === challenge.id;
-    const isCompleted = completedChallenges.includes(challenge.id);
-
-    return (
-      <View style={challengesStyles.currentChallengeContainer}>
-        <View style={challengesStyles.iconContainer}>
-          <Image
-            source={challenge.icon}
-            style={[
-              challengesStyles.challengeIcon,
-              { tintColor: progress >= 100 ? '#FFD962' : '#467d2a' }
-            ]}
-            resizeMode="contain"
-          />
-
-          <View style={challengesStyles.progressBadge}>
-            <Text style={challengesStyles.progressBadgeText}>{Math.round(progress)}%</Text>
-          </View>
-        </View>
-
-        <View style={challengesStyles.challengeContainer}>
-          <Text style={challengesStyles.challengeTitle}>{challenge.title}</Text>
-          <Text style={challengesStyles.challengeDescription}>{challenge.description}</Text>
-          <Text style={challengesStyles.challengeNote}>{challenge.note}</Text>
-
-          {challenge.medal && (
-            <Text style={challengesStyles.medalText}>Medalla: {challenge.medal}</Text>
-          )}
-
-          <Text style={challengesStyles.progressText}>{Math.round(progress)}% completado</Text>
-
-          {isCompleted ? (
-            <View style={challengesStyles.completedBadge}>
-              <Text style={challengesStyles.completedText}>¡Completado!</Text>
+  const renderGoalItem = (goal) => {
+    switch (goal.status) {
+      case 'unlocked':
+        return (
+          <View key={goal._id} style={challengesStyles.goalContainer}>
+            <View style={challengesStyles.iconContainer}>
+              <Image
+                source={iconMap[goal._id]}
+                style={challengesStyles.challengeIcon}
+                resizeMode="contain"
+              />
             </View>
-          ) : !isSelected ? (
-            <TouchableOpacity
-              style={challengesStyles.button}
-              onPress={() => startChallenge(challenge)}
-            >
+
+            <View style={challengesStyles.levelHeader}>
+              <Text style={challengesStyles.levelTitle}>{goal.title}</Text>
+              <Text style={challengesStyles.levelSubtitle}>{goal.description}</Text>
+            </View>
+
+            <TouchableOpacity style={challengesStyles.button} onPress={() => startChallenge(goal._id)} >
               <Text style={challengesStyles.buttonText}>Iniciar Desafío</Text>
             </TouchableOpacity>
-          ) : (
+          </View>
+        );
+
+      case 'in_progress':
+        return (
+          <View key={goal._id} style={challengesStyles.goalContainer}>
+
             <TouchableOpacity
-              style={challengesStyles.button}
-              onPress={() => navigation.navigate('Map')}
+              style={challengesStyles.deleteButton}
+              onPress={() => confirmDeleteUserGoal(goal._id)}
             >
-              <Text style={challengesStyles.buttonText}>Continuar</Text>
+              <Text style={challengesStyles.deleteButtonText}>x</Text>
             </TouchableOpacity>
-          )}
-        </View>
-      </View>
-    );
+
+            <View style={challengesStyles.iconContainer}>
+              <Image
+                source={iconMap[goal._id]}
+                style={[challengesStyles.challengeIcon, { tintColor: progress >= 100 ? '#FFD962' : '#467d2a' }]}
+                resizeMode="contain"
+              />
+              <View style={challengesStyles.progressBadge}>
+                <Text style={challengesStyles.progressBadgeText}>{Math.round(progress)}%</Text>
+              </View>
+            </View>
+
+            <View style={challengesStyles.challengeContainer}>
+              <Text style={challengesStyles.challengeTitle}>{goal.title}</Text>
+              <Text style={challengesStyles.challengeDescription}>{goal.description}</Text>
+              <Text style={challengesStyles.challengeNote}>{goal.note}</Text>
+
+              <View style={challengesStyles.progressTextContainer}>
+                <View>
+                  <Text style={challengesStyles.progressText}>Dist: {distance} kms</Text>
+                  <Text style={challengesStyles.progressText}>Vel prom: {speedAvg.toFixed(2)} km/h</Text>
+                </View>
+                <View>
+                  <Text style={challengesStyles.progressText}>Tiempo: {time} segs</Text>
+                  <Text style={challengesStyles.progressText}>Completado: {progress}%</Text>
+                </View>
+              </View>
+
+            </View>
+            <TouchableOpacity style={challengesStyles.button}>
+              <Text style={challengesStyles.buttonText}>En progreso</Text>
+            </TouchableOpacity>
+          </View>
+        );
+
+      case 'completed':
+        return (
+          <View key={goal._id} style={challengesStyles.goalContainer}>
+            <View style={challengesStyles.iconContainer}>
+              <Image
+                source={iconMap[goal._id]}
+                style={[challengesStyles.challengeIcon, { tintColor: progress >= 100 ? '#FFD962' : '#467d2a' }]}
+                resizeMode="contain"
+              />
+              <View style={challengesStyles.progressBadge}>
+                <Text style={challengesStyles.progressBadgeText}>{Math.round(progress)}%</Text>
+              </View>
+            </View>
+
+            <View style={challengesStyles.levelHeader}>
+              <Text style={challengesStyles.levelTitle}>{goal.title}</Text>
+            </View>
+
+            <TouchableOpacity style={challengesStyles.button}>
+              <Text style={challengesStyles.buttonText}>Completado!</Text>
+            </TouchableOpacity>
+          </View>
+        );
+
+      case 'locked':
+        return (
+          <View key={goal._id} style={challengesStyles.goalContainer}>
+            <View style={challengesStyles.iconContainer}>
+              <Image
+                source={iconMap[goal._id]}
+                style={[challengesStyles.challengeIcon, { tintColor: 'rgb(124, 124, 124)' }]}
+                resizeMode="contain"
+              />
+              <View style={challengesStyles.progressBadge}>
+                <Icon name="lock-closed" size={20} color="black" />
+              </View>
+            </View>
+
+            <View style={challengesStyles.levelHeader}>
+              <Text style={challengesStyles.levelTitle}>{goal.title}</Text>
+            </View>
+
+            <TouchableOpacity style={challengesStyles.button}>
+              <Text style={challengesStyles.buttonText}>Bloqueado</Text>
+            </TouchableOpacity>
+          </View>
+        );
+
+      default:
+        return null;
+    }
   };
+
 
   return (
     <ImageBackground source={require('../assets/fondo3.jpg')} style={challengesStyles.container} resizeMode="cover">
+      <Text style={challengesStyles.title}>Desafíos</Text>
+
       <ScrollView contentContainerStyle={challengesStyles.scrollContainer}>
-        <Text style={challengesStyles.title}>Desafíos</Text>
         {error ? <Text style={challengesStyles.errorText}>{error}</Text> : null}
-
-        <View style={challengesStyles.levelSelector}>
-          <TouchableOpacity
-            style={[
-              challengesStyles.levelButton,
-              activeLevel === 'beginner' && challengesStyles.levelButtonSelected,
-            ]}
-            onPress={() => setActiveLevel('beginner')}
-          >
-            <Text
-              style={[
-                challengesStyles.levelButtonText,
-                activeLevel === 'beginner' && challengesStyles.levelButtonTextSelected,
-              ]}
-            >
-              Principiante
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              challengesStyles.levelButton,
-              activeLevel === 'intermediate' && challengesStyles.levelButtonSelected,
-            ]}
-            onPress={() => setActiveLevel('intermediate')}
-          >
-            <Text
-              style={[
-                challengesStyles.levelButtonText,
-                activeLevel === 'intermediate' && challengesStyles.levelButtonTextSelected,
-              ]}
-            >
-              Intermedio
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              challengesStyles.levelButton,
-              activeLevel === 'advanced' && challengesStyles.levelButtonSelected,
-            ]}
-            onPress={() => setActiveLevel('advanced')}
-          >
-            <Text
-              style={[
-                challengesStyles.levelButtonText,
-                activeLevel === 'advanced' && challengesStyles.levelButtonTextSelected,
-              ]}
-            >
-              Avanzado
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={challengesStyles.levelHeader}>
-          <Text style={challengesStyles.levelTitle}>{challengeLevels[activeLevel].title}</Text>
-          <Text style={challengesStyles.levelSubtitle}>{challengeLevels[activeLevel].subtitle}</Text>
-        </View>
-
-        {renderCurrentChallenge()}
-
-        <View style={challengesStyles.progressIndicator}>
-          {challengeLevels[activeLevel].challenges.map((challenge, index) => (
-            <View
-              key={challenge.id}
-              style={[
-                challengesStyles.progressDot,
-                completedChallenges.includes(challenge.id) && challengesStyles.progressDotCompleted,
-                getCurrentChallenge().id === challenge.id && challengesStyles.progressDotCurrent
-              ]}
-            />
-          ))}
-        </View>
-
-        <View style={challengesStyles.bottomNav}>
-          <TouchableOpacity style={challengesStyles.navItem} onPress={handleProfilePress}>
-            <Icon name="person-circle" size={30} color="#FFFFFF" />
-            <Text style={challengesStyles.navText}>Perfil</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={challengesStyles.navItem} onPress={handleMapPress}>
-            <Icon name="map" size={30} color="#FFFFFF" />
-            <Text style={challengesStyles.navText}>Mapa</Text>
-          </TouchableOpacity>
-        </View>
-
+        {userGoals.length > 0 && userGoals.map(renderGoalItem)}
       </ScrollView>
+
+      <FooterScreen />
+
     </ImageBackground>
   );
 };

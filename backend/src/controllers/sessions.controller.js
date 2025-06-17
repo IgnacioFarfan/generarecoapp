@@ -9,30 +9,15 @@ export default class ProductsController {
 
     saveSession = async (req, res, next) => {
         try {
-            // Log the entire request body for debugging
-            console.log("Full request body:", JSON.stringify(req.body));
-            
             const { uid, distance, speedAvg, heartRateAvg, calories, time } = req.body;
-            
-            // Validate required fields
+
             if (!uid) {
-                console.error("Missing user ID in request");
-                return res.status(400).json({ 
-                    status: "error", 
-                    message: "User ID is required" 
+                CustomError.createError({
+                    message: `Usuario ID ${uid} no encontrado`,
+                    code: TErrors.NOT_FOUND
                 });
             }
-            
-            // Log the parsed values
-            console.log("Parsed values:", {
-                uid, 
-                distance: Number(distance), 
-                speedAvg: Number(speedAvg),
-                heartRateAvg: Number(heartRateAvg),
-                calories: Number(calories),
-                time: Number(time)
-            });
-            
+
             try {
                 // Convert values to numbers and ensure they're valid
                 const newSession = await this.sessionsRepo.saveSession(
@@ -43,31 +28,31 @@ export default class ProductsController {
                     Number(calories) || 0,
                     Number(time) || 0
                 );
-                
+
                 console.log("Session saved successfully:", newSession);
-                
+
                 // Update user's total kilometers
                 try {
-                    await this.usersRepo.incrementTotalKilometers(uid, Number(distance) || 0);
+                    await this.usersRepo.updateUserTotalKilometers(uid, Number(distance) || 0);
                     console.log("User total kilometers updated");
                 } catch (userError) {
                     console.error("Error updating user kilometers:", userError);
                     // Continue even if updating user kilometers fails
                 }
-                
+
                 return res.status(201).send({ status: "success", payload: newSession });
             } catch (repoError) {
                 console.error("Error in repository:", repoError);
-                return res.status(500).json({ 
-                    status: "error", 
+                return res.status(500).json({
+                    status: "error",
                     message: "Error saving session in repository",
                     error: repoError.message
                 });
             }
         } catch (error) {
             console.error("Unexpected error in saveSession:", error);
-            return res.status(500).json({ 
-                status: "error", 
+            return res.status(500).json({
+                status: "error",
                 message: "Unexpected error processing request",
                 error: error.message
             });
@@ -84,19 +69,19 @@ export default class ProductsController {
                     code: TErrors.NOT_FOUND
                 });
             }
-            
+
             // Get the last 3 sessions for this user
             let userSessions = await this.sessionsRepo.getUserSessions(uid, 3);
-            
-            
+
+
             res.status(200).send(userSessions);
         } catch (error) {
             next(error)
         }
     }
 
-    getUserStats = async (req, res, next) => {
-        const { uid, periodType } = req.params;
+    getUserStatsByPeriod = async (req, res, next) => {
+        const { uid, period } = req.params;
         try {
             const user = await this.usersRepo.getUserById(uid);
             if (!user) {
@@ -105,15 +90,15 @@ export default class ProductsController {
                     code: TErrors.NOT_FOUND
                 });
             }
-            
+
             // Log the request parameters for debugging
-            console.log(`Getting stats for user ${uid} with period ${periodType}`);
-            
-            let userStatsByPeriod = await this.sessionsRepo.getUserStats(uid, periodType);
-            
+            console.log(`Getting stats for user ${uid} with period ${period}`);
+
+            let userStatsByPeriod = await this.sessionsRepo.getUserStatsByPeriod(uid, period);
+
             // Log the response for debugging
             console.log('Stats response:', userStatsByPeriod);
-            
+
             res.status(200).send(userStatsByPeriod);
         } catch (error) {
             console.error('Error in getUserStats:', error);
@@ -121,17 +106,114 @@ export default class ProductsController {
         }
     }
 
-    getUserTotalDistance = async (req, res, next) => {
+
+    getUserTotalTime = async (req, res, next) => {
         const { uid } = req.params;
         try {
-            const user = await this.usersRepo.getUserById(uid);
-            if (!user) {
+            if (!uid) {
                 CustomError.createError({
-                    message: `Usuario ID ${uid} no encontrado`,
-                    code: TErrors.NOT_FOUND
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
                 });
             }
-            res.status(200).send({userTotalDistance: user.totalKilometers || 0});
+            const userTotalTime = await this.sessionsRepo.getUserTotalTime(uid);
+            res.status(200).send({ userTotalTime: userTotalTime })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getUserTotalVelocity = async (req, res, next) => {
+        const { uid } = req.params;
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const userTotalVelocity = await this.sessionsRepo.getUserTotalVelocity(uid);
+            res.status(200).send({ userTotalVelocity: userTotalVelocity })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getUserTotalSessions = async (req, res, next) => {
+        const { uid } = req.params;
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const userTotalSessions = await this.sessionsRepo.getUserTotalSessions(uid);
+            res.status(200).send({ userTotalSessions: userTotalSessions })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getUserDataSpeedAvg = async (req, res, next) => {
+        const { uid, period } = req.params;
+        try {
+            if (!uid || !period) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const userData = await this.sessionsRepo.getUserDataSpeedAvg(uid, period);
+            res.status(200).send(userData)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getUserDataTime = async (req, res, next) => {
+        const { uid, period } = req.params;
+        try {
+            if (!uid || !period) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const userData = await this.sessionsRepo.getUserDataTime(uid, period);
+            res.status(200).send(userData)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getUserDataDistance = async (req, res, next) => {
+        const { uid, period } = req.params;
+        try {
+            if (!uid || !period) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const userData = await this.sessionsRepo.getUserDataDistance(uid, period);
+            res.status(200).send(userData)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getUserPeriodContributionData = async (req, res, next) => {
+        const { uid, period } = req.params;
+        try {
+            if (!uid || !period) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const userData = await this.sessionsRepo.getUserPeriodContributionData(uid, period);
+            res.status(200).send(userData)
         } catch (error) {
             next(error)
         }

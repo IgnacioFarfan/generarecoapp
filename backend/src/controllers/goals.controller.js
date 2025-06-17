@@ -8,15 +8,15 @@ export default class GoalsController {
     }
 
     saveGoal = async (req, res, next) => {
-        const { distance, speedAvg = null, time = null } = req.body;
+        const { title, description, note, distance, time, icon } = req.body;
         try {
-            if (!distance) {
+            if (!icon || !title || !description) {
                 CustomError.createError({
                     message: `Datos no recibidos o inválidos.`,
                     code: TErrors.INVALID_TYPES,
                 });
             }
-            const newGoal = await this.goalsRepo.saveGoal({distance, speedAvg, time});
+            const newGoal = await this.goalsRepo.saveGoal({ title, description, note, distance, time, icon });
             res.status(200).send(newGoal);
         } catch (error) {
             next(error)
@@ -47,6 +47,42 @@ export default class GoalsController {
             next(error)
         }
     }
+
+    getGoalsByUserLevel = async (req, res, next) => {
+        const { uid } = req.params;
+        
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `ID de usuario no recibido.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const goalsByUserLevel = await this.goalsRepo.getGoalsByUserLevel(uid);// trae solamente los desafíos que coinciden con el rango del usuario y no terminados (finnish=null)
+            res.status(200).send(goalsByUserLevel);
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    
+    checkAndUpgradeUserLevel = async (req, res, next) => {
+        const { userId } = req.params;
+        try {
+            if (!userId) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            
+            const result = await this.goalsRepo.checkAndUpgradeUserLevel(userId);
+            res.status(200).send(result);
+        } catch (error) {
+            next(error)
+        }
+    }
+
 
     updateGoal = async (req, res, next) => {
         const { gid, distance, speedAvg = null, time = null } = req.body;
@@ -97,7 +133,7 @@ export default class GoalsController {
                     code: TErrors.INVALID_TYPES,
                 });
             }
-            
+
             // Check if goal exists
             const goal = await this.goalsRepo.getGoalById(goalId);
             if (!goal) {
@@ -106,7 +142,7 @@ export default class GoalsController {
                     code: TErrors.NOT_FOUND,
                 });
             }
-            
+
             // Use the existing usersGoals repository to save the user goal
             // You'll need to inject this repository in the constructor
             const newUserGoal = await this.usersGoalsRepo.saveUserGoal(userId, goalId);

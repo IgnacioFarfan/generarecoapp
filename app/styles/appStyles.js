@@ -4,7 +4,7 @@ export const appStyles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     backgroundImage: {
         position: 'absolute',
@@ -16,12 +16,10 @@ export const appStyles = StyleSheet.create({
         height: '100%',
     },
     scrollContainer: {
-        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingBottom: 20,
         paddingHorizontal: 30,
-        zIndex: 1,
     },
     logo: {
         width: 250,
@@ -36,14 +34,14 @@ export const appStyles = StyleSheet.create({
     },
     input: {
         height: 50,
-        width: '100%',
+        width: '80%',
         borderColor: '#ffffff',
         borderWidth: 0,
         marginBottom: 15,
         paddingHorizontal: 15,
         color: 'white',
         borderRadius: 25,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255, 255, 255, 0.29)',
         textAlign: 'center', // Added to center the placeholder text
     },
     button: {
@@ -62,7 +60,6 @@ export const appStyles = StyleSheet.create({
         elevation: 5,
     },
     socialContainer: {
-        width: '100%',
         alignItems: 'center',
     },
     socialButton: {
@@ -78,6 +75,10 @@ export const appStyles = StyleSheet.create({
         color: 'black',
         fontSize: 16,
     },
+    createAccountTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
     createAccountText: {
         color: 'white',
         fontSize: 14,
@@ -88,8 +89,13 @@ export const appStyles = StyleSheet.create({
     },
     errorText: {
         color: 'red',
-        fontSize: 14,
+        fontSize: 16,
         marginBottom: 10,
+        textAlign: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        padding: 5,
+        borderRadius: 5,
+        width: '90%',
     },
     debugContainer: {
         padding: 10,

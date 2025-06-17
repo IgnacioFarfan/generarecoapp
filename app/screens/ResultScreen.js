@@ -4,9 +4,11 @@ import MapView, { Polyline } from 'react-native-maps';
 import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import moment from 'moment';
-import apiService from '../services/api.service';
+//import apiService from '../services/api.service';
 import { resultScreenStyles } from '../styles/resultScreenStyles'
 import { useNavigation } from '@react-navigation/native';
+import { getUserTokenAndId } from '../tools/getUserTokenAndId';
+import FooterScreen from './FooterScreen';
 
 const ResultScreen = ({ route }) => {
     const navigation = useNavigation();
@@ -15,26 +17,26 @@ const ResultScreen = ({ route }) => {
     const viewShotRef = useRef(null);
     const [showParciales, setShowParciales] = useState(false);
     const [parciales, setParciales] = useState([]);
-    const [userId, setUserId] = useState(null);
-    const [token, setToken] = useState(null);
-    const [sessionSaved, setSessionSaved] = useState(false);
+    //const [userId, setUserId] = useState(null);
+    //const [token, setToken] = useState(null);
+    //const [sessionSaved, setSessionSaved] = useState(false);
 
     const averagePace = (time > 0) ? (time / kilometers) * 60 : 0; // Average pace in seconds per kilometer
     const avgMinutes = Math.floor(averagePace / 60);
     const avgSeconds = Math.round(averagePace % 60);
 
     // Get user token and ID on component mount
-    useEffect(() => {
+    /* useEffect(() => {
         async function getUserData() {
-            const { userId } = await getUserTokenAndId(navigation);
+            const { token, userId } = await getUserTokenAndId(navigation);
             setUserId(userId)
-            setToken(token);
+            //setToken(token);
         }
         getUserData();
-    }, []);
+    }, []); */
 
     // Verify session was saved or save it if not
-    useEffect(() => {
+    /* useEffect(() => {
         const checkSessionSaved = async () => {
             if (userId && token && !sessionSaved) {
                 try {
@@ -69,9 +71,9 @@ const ResultScreen = ({ route }) => {
         };
 
         checkSessionSaved();
-    }, [userId, token]);
+    }, [userId, token]); */
 
-    const saveSession = async () => {
+    /* const saveSession = async () => {
         try {
             // Validate userId exists
             if (!userId) {
@@ -114,7 +116,7 @@ const ResultScreen = ({ route }) => {
 
             console.error('Failed to save session to server');
         }
-    };
+    }; */
 
     useEffect(() => {
         if (pathCoordinates.length > 0) {
@@ -243,16 +245,13 @@ const ResultScreen = ({ route }) => {
                                 <Text style={resultScreenStyles.buttonText}>Compartir Resultados</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={resultScreenStyles.button} onPress={() => navigation.navigate('Profile')}>
-                                <Text style={resultScreenStyles.buttonText}>Volver al Perfil</Text>
-                            </TouchableOpacity>
-
                             {/* Add padding view to ensure content is fully visible */}
                             <View style={resultScreenStyles.bottomPadding} />
                         </View>
                     </ImageBackground>
                 </ScrollView>
             </ViewShot>
+            <FooterScreen />
         </SafeAreaView>
     );
 };

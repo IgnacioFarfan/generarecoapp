@@ -1,1 +1,0 @@
-router.put('/update-progress', ['USER'], usersGoalsController.updateGoalProgress);

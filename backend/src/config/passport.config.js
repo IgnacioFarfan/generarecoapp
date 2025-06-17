@@ -10,79 +10,37 @@ const localStrategy = local.Strategy;
 
 const initializePassport = () => {
 
-    passport.use("google", new GoogleStrategy(
-        {
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: process.env.GOOGLE_CALLBACK_URL,
-            scope: ["profile email"]
-        },
-        async (accessToken, refreshToken, profile, cb) => {
+    passport.use("google", new localStrategy(
+        { passReqToCallback: true, usernameField: "username" },
+        async (req, username, password, done) => {
+            const { googleId, firstName, lastName, email } = req.body;
             try {
-                const user = await usersRepository.getUser(profile.id);
+                const user = await usersRepository.getUser(googleId);
                 if (!user) {
-                    const userEmail = await usersRepository.getUser(profile._json.email);
+                    const userEmail = await usersRepository.getUser(email);
                     if (userEmail) {
-                        return cb(null, userEmail, { messages: "El Email asociado a ese Usuario ya existe." });
+                        return done(null, userEmail, { messages: "El Email asociado a ese Usuario ya existe." });
                     }
                     const newUser = await usersRepository.saveUser({
-                        userName: profile.name.givenName + Math.random().toString(36).substring(7),
-                        firstName: profile.name.givenName,
-                        lastName: profile.name.familyName,
-                        email: profile._json?.email,
+                        userName: firstName + Math.random().toString(36).substring(7),
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
                         password: Math.random().toString(36).substring(7),
-                        idgoogle: profile.id,
-                        gender: null,
-                        experience: 'Beginner'
+                        idgoogle: googleId
                     });
 
                     //await mailer({ mail: newUser.email, name: newUser.firstName }, "Bienvenido!")
-                    return cb(null, newUser);
-                }
-
-                await usersRepository.updateUserField(user._id, "lastLogin", moment().format("DD MM YYYY, h:mm:ss a"));
-                return cb(null, user);
-            } catch (error) {
-                return cb(error, null)
-            }
-        }
-    ));
-
-    /* passport.use("facebook", new FacebookStrategy(
-        {
-            clientID: process.env.GH_CLIENT_ID,
-            clientSecret: process.env.GH_CLIENT_SECRETS,
-            callbackURL: process.env.FB_CALLBACK_URL,
-            scope: ["user: email"]
-        },
-        async (accessToken, refreshToken, profile, done) => {
-            try {
-                const user = await usersRepository.getUser(profile.id);
-
-                if (!user) {
-                    const userEmail = await usersRepository.getUser(profile._json?.email);
-                    if (userEmail) return done(null, userEmail, { messages: "El Email asociado a ese Usuario ya existe." });
-
-                    const newUser = await usersRepository.saveUser({
-                        userName: profile.name.givenName + Math.random().toString(36).substring(7),
-                        firstName: profile.displayName.split(" ")[0],
-                        lastName: profile.displayName.split(" ")[1],
-                        email: profile._json?.email,
-                        password: Math.random().toString(36).substring(7),
-                        idFacebook: profile.id
-                    });
-
-                    await mailer({ mail: newUser.email, name: newUser.firstName }, "Bienvenido!")
                     return done(null, newUser);
                 }
-                
-                await usersRepository.updateUserLastLogin(user._id, moment().format("DD MM YYYY, h:mm:ss a"));
+
+                //await usersRepository.updateUserField(user._id, "lastLogin", moment().format("DD MM YYYY, h:mm:ss a"));
                 return done(null, user);
             } catch (error) {
                 return done(error, null)
             }
         }
-    )); */
+    ));
 
     passport.use("signin", new localStrategy(
         { passReqToCallback: true, usernameField: "username" },

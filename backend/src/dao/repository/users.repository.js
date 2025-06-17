@@ -9,7 +9,7 @@ export default class UsersRepository {
     };
 
     getUser = async (id) => {
-        let user = await this.usersModel.findOne({ $or: [{ userName: id }, { email: id }, { idGoogle: id }, { idFacebook: id }] });
+        let user = await this.usersModel.findOne({ $or: [{ userName: id }, { email: id }, { idGoogle: id }] });
         return user;
     };
 
@@ -29,11 +29,11 @@ export default class UsersRepository {
         return user;
     };
 
-    /* updateUserPassword = async (uid, newPassword) => {
+    updateUserPassword = async (uid, newPassword) => {
         const user = await this.usersModel.findByIdAndUpdate(uid, {password: newPassword});
         return user;
     };
-
+/* 
     updateUserAvatar = async (uid, newAvatarUrl) => {
         const user = await this.usersModel.findByIdAndUpdate(uid, {avatar: newAvatarUrl});
         return user;
@@ -58,7 +58,7 @@ export default class UsersRepository {
         return;
     };
 
-    incrementTotalKilometers = async (uid, distance) => {
+    updateUserTotalKilometers = async (uid, distance) => {
         const result = await this.usersModel.updateOne(
             { _id: uid },
             { $inc: { totalKilometers: distance } }

@@ -6,9 +6,18 @@ export const challengesStyles = StyleSheet.create({
     },
     scrollContainer: {
         flexGrow: 1,
-        paddingVertical: 20,
+        paddingTop: 20,
+        paddingBottom: 80,
         paddingHorizontal: 15,
+        gap: 50
+    },
+    goalContainer: {
+        width: '100%',
         alignItems: 'center',
+        textAlign: 'center',
+        backgroundColor: 'rgba(165, 165, 165, 0.21)',
+        padding: 20,
+        borderRadius: 20
     },
     title: {
         fontSize: 28,
@@ -16,6 +25,10 @@ export const challengesStyles = StyleSheet.create({
         fontWeight: 'bold',
         marginVertical: 20,
         textAlign: 'center',
+    },
+    deleteButtonText: {
+        fontSize: 25,
+        color: 'white'
     },
     errorText: {
         color: 'red',
@@ -40,6 +53,9 @@ export const challengesStyles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
     },
+    deleteButton: {
+        alignSelf: 'flex-end'
+    },
     levelButtonSelected: {
         backgroundColor: '#467d2a',
         borderColor: '#467d2a',
@@ -60,12 +76,14 @@ export const challengesStyles = StyleSheet.create({
         fontSize: 22,
         color: 'white',
         fontWeight: 'bold',
+        textAlign: 'center'
     },
     levelSubtitle: {
         fontSize: 16,
         color: 'white',
         fontStyle: 'italic',
         marginTop: 5,
+        textAlign: 'center'
     },
     currentChallengeContainer: {
         width: '100%',
@@ -144,6 +162,12 @@ export const challengesStyles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 10,
     },
+    progressTextContainer: {
+        flexDirection: 'row',
+        gap: 35,
+        justifyContent: 'center',
+        marginVertical: 15
+    },
     progressText: {
         fontSize: 14,
         color: '#555',
@@ -151,7 +175,8 @@ export const challengesStyles = StyleSheet.create({
     },
     button: {
         backgroundColor: '#467d2a',
-        padding: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 18,
         borderRadius: 20,
         alignItems: 'center',
     },
@@ -194,12 +219,12 @@ export const challengesStyles = StyleSheet.create({
     },
     progressBadge: {
         position: 'absolute',
-        bottom: 10,
-        right: 10,
+        bottom: 3,
+        right: 3,
         backgroundColor: 'white',
-        borderRadius: 15,
-        width: 30,
-        height: 30,
+        borderRadius: 20,
+        width: 40,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,
@@ -229,5 +254,30 @@ export const challengesStyles = StyleSheet.create({
     navText: {
         color: 'white',
         fontSize: 12,
+    },
+    tabContainer: {
+        flexDirection: 'row',
+        marginTop: 20,
+        marginBottom: 10,
+        width: '80%',
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        overflow: 'hidden',
+    },
+    tab: {
+        flex: 1,
+        paddingVertical: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    activeTab: {
+        backgroundColor: '#467d2a',
+    },
+    tabText: {
+        color: 'white',
+        fontWeight: '500',
+    },
+    activeTabText: {
+        fontWeight: 'bold',
     }
 });

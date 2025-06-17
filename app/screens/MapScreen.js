@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StatusBar, Image, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert, Modal, ImageBackground } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, Polyline } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,14 +15,7 @@ import { customNightMap } from '../styles/customMapStyle';
 // Import API service
 import apiService from '../services/api.service';
 import { getUserTokenAndId } from '../tools/getUserTokenAndId';
-
-const Speedometer = ({ speed }) => {
-    return (
-        <View style={mapScreenStyles.speedometerContainer}>
-            <Text style={mapScreenStyles.speedometerText}>Velocidad: {speed.toFixed(2)} km/h</Text>
-        </View>
-    );
-};
+import FooterScreen from './FooterScreen';
 
 const getRandomTip = () => {
     return tips[Math.floor(Math.random() * tips.length)];
@@ -32,9 +25,7 @@ const MapScreen = () => {
     const navigation = useNavigation();
     const [initialRegion, setInitialRegion] = useState(null);
     const [userId, setUserId] = useState(null);
-    //const [token, setToken] = useState(null);
 
-    // Get user token and ID on component mount
     useEffect(() => {
         async function getUserData() {
             const { userId } = await getUserTokenAndId(navigation);
@@ -110,30 +101,14 @@ const MapScreen = () => {
                 time: seconds
             };
 
-            // Get the selected challenge
-            const selectedChallenge = await AsyncStorage.getItem('selectedChallenge');
-
-            // Save session to backend
-            const response = await apiService.saveSession(sessionData);
-            console.log('Session saved to backend:', response.data);
-
-            // Update challenge progress if there's an active challenge
-            if (selectedChallenge) {
-                try {
-                    console.log('Selected challenge:', selectedChallenge);
-
-                    // Get the actual goal ID from the selected challenge
-                    // This assumes selectedChallenge is the actual MongoDB ObjectId
-                    // If it's not, we need to look up the actual goal ID
-
-                    // Update the user's goal progress
-                    await apiService.updateUserGoalProgress(userId, selectedChallenge, parseFloat(kilometer.toFixed(2)), seconds);
-                    console.log('Challenge progress updated');
-                } catch (error) {
-                    console.error('Error updating challenge progress:', error);
-                    // Don't show an alert to the user, just log the error
-                }
+            if (avgSpeed < 20) {// CAMBIAR A MAYOR CUANDO PASE A PRODUCIÓN!
+                // guardar session con el condicional de que la velocidad promedio (avgSpeed) sea mayor que 20km/h
+                await apiService.saveSession(sessionData);
+                await apiService.updateUserTotalKilometers(userId, sessionData.distance);
+                console.log('se grabó la sessión:', avgSpeed, 'es mayor que 20kms/h');
+                
             }
+
 
             // Still save locally for the result screen
             const runData = {
@@ -157,10 +132,6 @@ const MapScreen = () => {
             console.error('Error storing session data:', error);
             Alert.alert('Error', 'No se pudo guardar los datos de la sesión');
         }
-    };
-
-    const generateRandomSpeed = () => {
-        return Math.random() * 20;
     };
 
     const updateMarkerPosition = (position) => {
@@ -282,19 +253,6 @@ const MapScreen = () => {
         }
     };
 
-    // Navigation handlers
-    const handleProfilePress = () => {
-        navigation.navigate('Profile');
-    };
-
-    const handleChallengesPress = () => {
-        navigation.navigate('Challenges');
-    };
-
-    const handleNewsPress = () => {
-        Alert.alert('Noticias', 'Sección de noticias próximamente');
-    };
-
     // Add this function to center the map on the current location
     const centerMapOnUser = () => {
         if (mapViewRef.current && markerPosition) {
@@ -317,16 +275,21 @@ const MapScreen = () => {
     };
 
     return (
-        <View style={mapScreenStyles.container}>
-            <View style={mapScreenStyles.topGradient}>
-                <View style={mapScreenStyles.infoContainer}></View>
+        <ImageBackground
+            source={require('../assets/fondo3.jpg')}
+            style={mapScreenStyles.container}
+            resizeMode="cover"
+        >
+            <>
+                <View style={mapScreenStyles.topGradient}>
+                    <View style={mapScreenStyles.infoContainer}></View>
 
-                <View style={mapScreenStyles.tableContainer}>
-                    <Text style={mapScreenStyles.tableHeader}>Tiempo  Distancia   Velocidad</Text>
-                    <Text style={mapScreenStyles.tableRow}>{`${minutes}:${remainingSeconds.toString().padStart(2, '0')}          ${kilometerText} km           ${currentSpeedText} km/h`}</Text>
-                </View>
+                    <View style={mapScreenStyles.tableContainer}>
+                        <Text style={mapScreenStyles.tableHeader}>Tiempo  Distancia   Velocidad</Text>
+                        <Text style={mapScreenStyles.tableRow}>{`${minutes}:${remainingSeconds.toString().padStart(2, '0')}          ${kilometerText} km           ${currentSpeedText} km/h`}</Text>
+                    </View>
 
-                {/* Media control buttons commented out
+                    {/* Media control buttons commented out
                 <View style={mapScreenStyles.row}>
                     <TouchableOpacity style={mapScreenStyles.button}>
                         <Icon name="play-back-outline" size={24} color="#FFFFFF" />
@@ -342,106 +305,96 @@ const MapScreen = () => {
                     </TouchableOpacity>
                 </View>
                 */}
-            </View>
+                </View>
 
-            {initialRegion ? (
-                <MapView
-                    provider={PROVIDER_GOOGLE}
-                    style={mapScreenStyles.map}
-                    initialRegion={initialRegion}
-                    showsUserLocation={true}
-                    followsUserLocation={followUserLocation}
-                    showsMyLocationButton={false}
-                    ref={mapViewRef}
-                    onPanDrag={handleMapDrag}
-                    customMapStyle={customNightMap}
+                {initialRegion ? (
+                    <MapView
+                        provider={PROVIDER_GOOGLE}
+                        style={mapScreenStyles.map}
+                        initialRegion={initialRegion}
+                        showsUserLocation={true}
+                        followsUserLocation={followUserLocation}
+                        showsMyLocationButton={false}
+                        ref={mapViewRef}
+                        onPanDrag={handleMapDrag}
+                        customMapStyle={customNightMap}
+                    >
+                        {pathCoordinates.length > 0 && (
+                            <Polyline coordinates={pathCoordinates} strokeColor="green" strokeWidth={4} />
+                        )}
+                        {markerPosition && (
+                            <Marker
+                                coordinate={markerPosition}
+                                title="Punto de ubicación"
+                                description="Esta es la ubicación en movimiento."
+                                anchor={{ x: 0.5, y: 0.5 }}
+                            >
+                                <Image source={seedIcon} style={{ width: 50, height: 50 }} />
+                            </Marker>
+                        )}
+                    </MapView>
+                ) : (
+                    <View>
+                        <View style={mapScreenStyles.loadingContainer}>
+                            <Text style={mapScreenStyles.loadingText}>Obteniendo ubicación...</Text>
+                        </View>
+                    </View>
+                )}
+
+                <TouchableOpacity
+                    style={[
+                        mapScreenStyles.centerMapButton,
+                        followUserLocation ? mapScreenStyles.centerMapButtonActive : {}
+                    ]}
+                    onPress={centerMapOnUser}
                 >
-                    {pathCoordinates.length > 0 && (
-                        <Polyline coordinates={pathCoordinates} strokeColor="green" strokeWidth={4} />
-                    )}
-                    {markerPosition && (
-                        <Marker
-                            coordinate={markerPosition}
-                            title="Punto de ubicación"
-                            description="Esta es la ubicación en movimiento."
-                            anchor={{ x: 0.5, y: 0.5 }}
-                        >
-                            <Image source={seedIcon} style={{ width: 50, height: 50 }} />
-                        </Marker>
-                    )}
-                </MapView>
-            ) : (
-                <View>
-                    <View style={mapScreenStyles.loadingContainer}>
-                        <Text style={mapScreenStyles.loadingText}>Obteniendo ubicación...</Text>
-                    </View>
-                </View>
-            )}
-
-            <TouchableOpacity
-                style={[
-                    mapScreenStyles.centerMapButton,
-                    followUserLocation ? mapScreenStyles.centerMapButtonActive : {}
-                ]}
-                onPress={centerMapOnUser}
-            >
-                <Icon
-                    name="locate"
-                    size={24}
-                    color={followUserLocation ? "#FFFFFF" : "#457d2b"} // Changed from #457b2f to #457d2b
-                />
-            </TouchableOpacity>
-
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={tipsModalVisible}
-                onRequestClose={() => setTipsModalVisible(false)}
-            >
-                <View style={mapScreenStyles.modalContainer}>
-                    <View style={mapScreenStyles.modalView}>
-                        <Text style={mapScreenStyles.modalText}>Consejo para correr:</Text>
-                        <Text>{tip}</Text>
-                        <TouchableOpacity
-                            style={mapScreenStyles.startButton}
-                            onPress={() => {
-                                setTipsModalVisible(false);
-                                startChronometer();
-                            }}
-                            disabled={countdown > 0}
-                        >
-                            <Text style={mapScreenStyles.buttonText}>{countdown > 0 ? `Listo (${countdown})` : 'Iniciar'}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-
-            <Modal animationType="fade" transparent={true} visible={countdownVisible}>
-                <View style={mapScreenStyles.countdownModalContainer}>
-                    <Text style={mapScreenStyles.countdownText}>{countdown > 0 ? countdown : 0}</Text>
-                </View>
-            </Modal>
-
-            <TouchableOpacity
-                style={mapScreenStyles.floatingButton}
-                onPress={isRunning ? stopChronometer : showTips}
-                disabled={countdown > 0 && !isRunning}
-            >
-                <Text style={mapScreenStyles.buttonText}>{isRunning ? 'Terminar' : countdown > 0 ? `Iniciar` : 'Iniciar'}</Text>
-            </TouchableOpacity>
-
-            <View style={mapScreenStyles.bottomNav}>
-                <TouchableOpacity style={mapScreenStyles.navItem} onPress={handleProfilePress}>
-                    <Icon name="rocket" size={30} color="#FFFFFF" />
-                    <Text style={mapScreenStyles.navText}>Progreso</Text>
+                    <Icon
+                        name="locate"
+                        size={24}
+                        color={followUserLocation ? "#FFFFFF" : "#457d2b"} // Changed from #457b2f to #457d2b
+                    />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={mapScreenStyles.navItem} onPress={handleChallengesPress}>
-                    <Icon name="trophy" size={30} color="#FFFFFF" />
-                    <Text style={mapScreenStyles.navText}>Desafíos</Text>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={tipsModalVisible}
+                    onRequestClose={() => setTipsModalVisible(false)}
+                >
+                    <View style={mapScreenStyles.modalContainer}>
+                        <View style={mapScreenStyles.modalView}>
+                            <Text style={mapScreenStyles.modalText}>Consejo para correr:</Text>
+                            <Text>{tip}</Text>
+                            <TouchableOpacity
+                                style={mapScreenStyles.startButton}
+                                onPress={() => {
+                                    setTipsModalVisible(false);
+                                    startChronometer();
+                                }}
+                                disabled={countdown > 0}
+                            >
+                                <Text style={mapScreenStyles.buttonText}>{countdown > 0 ? `Listo (${countdown})` : 'Iniciar'}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                <Modal animationType="fade" transparent={true} visible={countdownVisible}>
+                    <View style={mapScreenStyles.countdownModalContainer}>
+                        <Text style={mapScreenStyles.countdownText}>{countdown > 0 ? countdown : 0}</Text>
+                    </View>
+                </Modal>
+
+                <TouchableOpacity
+                    style={mapScreenStyles.floatingButton}
+                    onPress={isRunning ? stopChronometer : showTips}
+                    disabled={countdown > 0 && !isRunning}
+                >
+                    <Text style={mapScreenStyles.buttonText}>{isRunning ? 'Terminar' : countdown > 0 ? `Iniciar` : 'Iniciar'}</Text>
                 </TouchableOpacity>
-            </View>
-        </View>
+            </>
+            <FooterScreen />
+        </ImageBackground>
     );
 };
 

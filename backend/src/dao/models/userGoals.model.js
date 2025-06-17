@@ -3,9 +3,8 @@ import mongoose from "mongoose";
 const userGoalsCollection = "usergoals";
 
 const userGoalsSchema = new mongoose.Schema({
-    distance: { type: Number, default: 0 },
     start: { type: Date, default: Date.now },
-    finnish: Date,
+    finnish: { type: Date, default: null },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users"
@@ -13,7 +12,7 @@ const userGoalsSchema = new mongoose.Schema({
     goal: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "goals"
-    }
+    },
 });
 
 const userGoalsModel = mongoose.model(userGoalsCollection, userGoalsSchema);

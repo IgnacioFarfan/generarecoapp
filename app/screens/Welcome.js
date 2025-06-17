@@ -6,6 +6,7 @@ import { SLIDES } from '../content/welcomeSlides';
 import { welcomeStyles } from '../styles/welcomeStyles';
 import { useNavigation } from '@react-navigation/native';
 import { getUserTokenAndId } from '../tools/getUserTokenAndId';
+//import FooterScreen from './FooterScreen';
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
@@ -91,6 +92,7 @@ const WelcomeScreen = () => {
       <TouchableOpacity style={welcomeStyles.button} onPress={() => navigation.navigate('Settings')}>
         <Text style={welcomeStyles.buttonText}>Continuar</Text>
       </TouchableOpacity>
+      {/* <FooterScreen/> */}
     </ImageBackground>
   );
 };

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import usersRouter from "./users.route.js";
 import goalsRouter from "./goals.route.js";
-import usersGoalsRouter from "./usersGoals.route.js";
+import userGoalsRouter from "./usersGoals.route.js";
 import sessionsRouter from "./sessions.route.js";
 
 const router = Router();
@@ -17,7 +17,7 @@ router.get("/api", (req, res) => {
 
 router.use("/api/users", usersRouter);
 router.use("/api/goals", goalsRouter);
-router.use("/api/usersgoals", usersGoalsRouter);
+router.use("/api/usersgoals", userGoalsRouter);
 router.use("/api/sessions", sessionsRouter);
 
 export default router;

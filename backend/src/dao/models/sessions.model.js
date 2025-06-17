@@ -7,7 +7,6 @@ const sessionSchema = new mongoose.Schema({
     speedAvg: { type: Number, required: true },
     time: { type: Number, required: true },
     sessionDate: { type: Date, default: Date.now },
-    heartRateAvg: Number,
     calories: Number,
     user: {
         type: mongoose.Schema.Types.ObjectId,

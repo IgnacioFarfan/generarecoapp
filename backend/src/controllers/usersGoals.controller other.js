@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import CustomError from "../tools/customErrors/customError.js";
+import TErrors from "../tools/customErrors/enum.js";
 
 export default class UsersGoalsController {
     constructor(usersGoalsRepo, usersRepo, goalsRepo) {
@@ -265,49 +267,19 @@ export default class UsersGoalsController {
             next(error);
         }
     }
-    
+
     getUserGoals = async (req, res, next) => {
+        const { uid } = req.params;
         try {
-            const { uid } = req.params;
             if (!uid) {
-                return res.status(400).json({
-                    status: "error",
-                    message: "User ID is required"
+                CustomError.createError({
+                    message: `ID de usuario no recibido.`,
+                    code: TErrors.INVALID_TYPES,
                 });
             }
-
-            // Get all user goals
-            const userGoals = await this.usersGoalsRepo.getUserGoals(uid);
-            
-            // Add progress calculation to each goal
-            const goalsWithProgress = await Promise.all(userGoals.map(async (userGoal) => {
-                let progress = 0;
-                
-                // Make sure goal is populated
-                if (!userGoal.goal || typeof userGoal.goal === 'string') {
-                    userGoal = await this.usersGoalsRepo.getUserGoalById(userGoal._id);
-                }
-                
-                // Calculate progress based on goal type
-                if (userGoal.goal.distance) {
-                    progress = Math.min((userGoal.distance / userGoal.goal.distance) * 100, 100);
-                } else if (userGoal.goal.time) {
-                    progress = Math.min((userGoal.time / userGoal.goal.time) * 100, 100);
-                }
-                
-                return {
-                    ...userGoal.toObject(),
-                    progress: progress,
-                    completed: userGoal.finnish !== null
-                };
-            }));
-            
-            res.status(200).json({
-                status: "success",
-                data: goalsWithProgress
-            });
+            const userGoal = await this.usersGoalsRepo.getUserGoals(uid);
+            res.status(200).send(userGoal)
         } catch (error) {
-            console.error('Error getting user goals:', error);
             next(error);
         }
     }
@@ -335,4 +307,5 @@ export default class UsersGoalsController {
             next(error);
         }
     }
+
 }
