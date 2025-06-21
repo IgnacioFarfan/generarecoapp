@@ -9,7 +9,17 @@ const router = Router();
 
 router.post("/savesession", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.saveSession);
 router.get("/getuserssessions/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserSessions);
-router.get("/getuserstats/:uid/:periodType", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserStats);
-router.get("/getusertotaldistance/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalDistance);
+router.get("/getuserstats/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserStatsByPeriod);
+
+router.get("/getusertotaltime/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalTime);
+router.get("/getusertotalvelocity/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalVelocity);
+router.get("/getusertotalsessions/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalSessions);
+
+router.get("/getuserdatadistance/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserDataDistance);
+router.get("/getuserdatatime/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserDataTime);
+router.get("/getuserdataspeedavg/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserDataSpeedAvg);
+
+router.get("/getuserdatacontribution/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserPeriodContributionData);
+
 
 export default router;

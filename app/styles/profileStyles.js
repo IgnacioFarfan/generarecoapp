@@ -6,10 +6,43 @@ export const profileStyles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
+        paddingTop: 30
+    },
+    profileContainer: {
+        paddingBottom: 80
+    },
+    profileButtonsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 30,
+        marginTop: 20
+    },
+    graphsContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingBottom: 50
+    },
+    graphContributionContainer: {
+        backgroundColor: 'rgba(255, 255, 255, 0.39)',
+        borderRadius: 10,
+        marginBottom: 30,
+        width: '90%',
+        alignItems: 'center',
+        padding: 20
+    },
+    graphContainer: {
+        backgroundColor: 'rgba(255, 255, 255, 0.39)',
+        borderRadius: 10,
+        marginBottom: 30
+    },
+    barContainer: {
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     shareIconContainer: {
         position: 'absolute',
-        top: 40,
+        top: 15,
         right: 10,
         zIndex: 2,
     },
@@ -46,6 +79,28 @@ export const profileStyles = StyleSheet.create({
         color: 'black',  // Changed to black
         fontSize: 18,
         textAlign: 'center',
+    },
+    totalsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 70,
+        marginTop: 30
+    },
+    totalsItemContainer: {
+        borderColor: 'white',
+        borderWidth: 2,
+        borderRadius: 100,
+        marginBottom: 30,
+        marginTop: 10,
+        paddingVertical: 30,
+        width: 100
+    },
+    totalText: {
+        fontWeight: '500',
+        color: 'white',
+        fontSize: 20,
+        textAlign: 'center'
     },
     chartContainer: {
         marginTop: 0,
@@ -118,6 +173,7 @@ export const profileStyles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
+        backgroundColor: 'black'
     },
     navItem: {
         alignItems: 'center',
@@ -127,17 +183,13 @@ export const profileStyles = StyleSheet.create({
         fontSize: 12,
     },
     backButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
         backgroundColor: 'white',
         padding: 10,
         borderRadius: 5,
-        marginTop: 20,
     },
     backButtonText: {
         fontSize: 16,
-        color: 'black',
-        marginLeft: 5,
+        color: 'black'
     },
     visible: {
         display: 'flex',
@@ -149,6 +201,25 @@ export const profileStyles = StyleSheet.create({
         flexDirection: 'row',
         marginTop: 20,
         marginBottom: 10,
+        width: '85%',
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        overflow: 'hidden',
+    },
+    tabPeriodContainer: {
+        flexDirection: 'row',
+        alignSelf: 'flex-end',
+        marginTop: 30,
+        marginBottom: 10,
+        width: '40%',
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        overflow: 'hidden',
+    },
+    infoTabContainer: {
+        flexDirection: 'row',
+        marginTop: 20,
+        marginBottom: 10,
         width: '80%',
         borderRadius: 25,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -156,27 +227,44 @@ export const profileStyles = StyleSheet.create({
     },
     tab: {
         flex: 1,
-        paddingVertical: 10,
+        paddingVertical: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    periodTab: {
+        flex: 1,
+        paddingVertical: 5,
         alignItems: 'center',
         justifyContent: 'center',
     },
     activeTab: {
         backgroundColor: '#467d2a',
     },
+    tabTextHeatMap: {
+        color: 'white',
+        fontWeight: '500',
+        textAlign: 'center',
+        marginBottom: 20
+    },
     tabText: {
         color: 'white',
         fontWeight: '500',
+        textAlign: 'center',
+    },
+    tabPeriodText: {
+        color: 'white',
     },
     activeTabText: {
         fontWeight: 'bold',
     },
     treeContainer: {
+        flex: 1,
         width: '80%',
-        backgroundColor: 'transparent', // Changed from rgba(255, 255, 255, 0.8) to transparent
+        backgroundColor: 'transparent',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
-        marginVertical: 10,
+        marginTop: 90,
     },
     treeImage: {
         width: 250,
@@ -197,17 +285,12 @@ export const profileStyles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     logoutButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
         backgroundColor: '#d9534f',
         padding: 10,
         borderRadius: 5,
-        marginTop: 15,
     },
     logoutButtonText: {
         fontSize: 16,
-        color: 'white',
-        marginLeft: 5,
-        fontWeight: 'bold',
+        color: 'white'
     },
 });

@@ -6,10 +6,10 @@ const { default: usersDB } = await import("../repository/users.repository.js");
 usersRepository = new usersDB(models.users);
 
 const { default: goalsDB } = await import("../repository/goals.repository.js");
-goalsRepository = new goalsDB(models.goals);
+goalsRepository = new goalsDB(models.goals, models.userGoals, models.users);
 
 const { default: userGoalsDB } = await import("../repository/usersGoals.repository.js");
-usersGoalsRepository = new userGoalsDB(models.userGoals);
+usersGoalsRepository = new userGoalsDB(models.userGoals, models.sessions, models.goals,);
 
 const { default: sessionsDB } = await import("../repository/sessions.repository.js");
 sessionsRepository = new sessionsDB(models.sessions);

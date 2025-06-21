@@ -12,17 +12,20 @@ const router = Router();
 
 router.post("/login", isSessionOn(), passportCall("login"), handlePolicies(["PUBLIC"]), usersController.userSigninOrLogin);
 router.post("/signin", isSessionOn(), passportCall("signin"), handlePolicies(["PUBLIC"]), usersController.userSigninOrLogin);
+router.post("/gstrategy", isSessionOn(), passportCall("google"), handlePolicies(["PUBLIC"]), usersController.userSigninOrLogin);
+router.get("/logout", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.userLogout);
+
 router.get("/passrestoration/:email", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.passRestoration);
 router.post("/forgot", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.userForgotPass);
-router.get("/logout", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.userLogout);
-router.get("/facebook", isSessionOn(), passportCall("facebook"), handlePolicies(["PUBLIC"]), usersController.facebook);
-router.get("/fbstrategy", isSessionOn(), passportCall("facebook"), handlePolicies(["PUBLIC"]), usersController.facebookStrategy);
-router.get("/google", isSessionOn(), passportCall("google"), handlePolicies(["PUBLIC"]), usersController.google);
-router.get("/gstrategy", isSessionOn(), passportCall("google"), handlePolicies(["PUBLIC"]), usersController.googleStrategy);
-router.put("/avatar/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), uploads.single("avatar"), usersController.updateUserAvatar);
+
 router.get("/getusers", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getAllUsers);
 router.get("/getuser/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getUser);
+router.get("/getusertotaldistance/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getUserTotalDistance);
+
+router.put("/avatar/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), uploads.single("avatar"), usersController.updateUserAvatar);
 router.put("/updateuserstatus/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserStatus);
 router.put("/updateuser", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUser);
+router.put("/updateusertotaldistance/:uid/:distance", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserTotalKilometers);
+router.put("/updateuserpassword", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserPassword);
 
 export default router;

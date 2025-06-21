@@ -14,6 +14,7 @@ import usersGoalsRouter from "../routes/usersGoals.route.js";
 }; */
 
 export default async function appLoader(app) {
+    app.disable('x-powered-by')
     //app.use(cors(corsOptions));
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
