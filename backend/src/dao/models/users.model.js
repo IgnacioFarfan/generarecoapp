@@ -16,8 +16,9 @@ const userSchema = new mongoose.Schema({
     weight: Number,
     age: Number,
     gender: { type: String, enum: ['Masculino', 'Femenino', 'Otro'], default: 'Otro' },
-    avatar: { type: String, default: "https://localhost:8080/public/data/userguest3.png" },
-    totalKilometers: { type: Number, default: 0 }
+    avatar: { type: String, default: "http://192.168.100.48:5000/userguest3.png" },
+    totalKilometers: { type: Number, default: 0 },
+    medal: { type: Number, default: 0 }
 });
 
 const usersModel = mongoose.model(userCollection, userSchema);

@@ -2,7 +2,6 @@ import { usersRepository } from "../dao/repository/index.js";
 import passport from "passport";
 import local from "passport-local";
 import { createHash, isValidPass } from "../tools/utils.js";
-import GoogleStrategy from "passport-google-oauth20";
 //import mailer from "../tools/mailer.js";
 import moment from 'moment';
 
@@ -18,9 +17,8 @@ const initializePassport = () => {
                 const user = await usersRepository.getUser(googleId);
                 if (!user) {
                     const userEmail = await usersRepository.getUser(email);
-                    if (userEmail) {
-                        return done(null, userEmail, { messages: "El Email asociado a ese Usuario ya existe." });
-                    }
+                    if (userEmail) return done(null, userEmail, { messages: "El Email asociado a ese Usuario ya existe." });
+
                     const newUser = await usersRepository.saveUser({
                         userName: firstName + Math.random().toString(36).substring(7),
                         firstName: firstName,

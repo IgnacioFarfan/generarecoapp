@@ -55,8 +55,9 @@ export default class UsersController {
             const avatar = user.avatar;
             const id = user._id;
             const status = user.status;
+            const medal = user.medal;
             let token = generateToken({ userName, id, email });
-            res.status(200).send({ id, userName, status, firstName, lastName, email, lastLogin, height, weight, age, avatar, token })
+            res.status(200).send({ id, userName, status, firstName, lastName, email, lastLogin, height, weight, age, avatar, token, medal })
         } catch (error) {
             next(error)
         }
@@ -265,6 +266,51 @@ export default class UsersController {
                 });
             }            
             res.status(200).send({totalKilometers: user.totalKilometers})
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    getUserMedal = async (req, res, next) => {
+        const { uid } = req.params;
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const user = await this.usersRepo.getUserById(uid);            
+            if (!user) {
+                CustomError.createError({
+                    message: `Usuario ID ${uid} no encontrado.`,
+                    code: TErrors.NOT_FOUND,
+                });
+            }            
+            res.status(200).send({userMedal: user.medal})
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    updateUserMedal = async (req, res, next) => {
+        const { uid, medal } = req.params;
+        try {
+            if (!uid || !medal) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const user = await this.usersRepo.getUserById(uid);            
+            if (!user) {
+                CustomError.createError({
+                    message: `Usuario ID ${uid} no encontrado.`,
+                    code: TErrors.NOT_FOUND,
+                });
+            }
+            await this.usersRepo.updateUserMedal(uid, medal);
+            res.status(200).send({userMedal: user.medal})
         } catch (error) {
             next(error)
         }

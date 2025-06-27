@@ -21,11 +21,13 @@ router.post("/forgot", isSessionOn(), handlePolicies(["PUBLIC"]), usersControlle
 router.get("/getusers", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getAllUsers);
 router.get("/getuser/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getUser);
 router.get("/getusertotaldistance/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getUserTotalDistance);
+router.get("/getusermedal/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getUserMedal);
 
 router.put("/avatar/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), uploads.single("avatar"), usersController.updateUserAvatar);
 router.put("/updateuserstatus/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserStatus);
 router.put("/updateuser", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUser);
 router.put("/updateusertotaldistance/:uid/:distance", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserTotalKilometers);
 router.put("/updateuserpassword", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserPassword);
+router.put("/updateusermedal/:uid/:medal", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserMedal);
 
 export default router;

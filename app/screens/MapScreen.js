@@ -101,7 +101,7 @@ const MapScreen = () => {
                 time: seconds
             };
 
-            if (avgSpeed < 20) {// CAMBIAR A MAYOR CUANDO PASE A PRODUCIÓN!
+            if (avgSpeed < 20) {// CAMBIAR A MAYOR CUANDO PASE A PRODUCCIÓN!
                 // guardar session con el condicional de que la velocidad promedio (avgSpeed) sea mayor que 20km/h
                 await apiService.saveSession(sessionData);
                 await apiService.updateUserTotalKilometers(userId, sessionData.distance);

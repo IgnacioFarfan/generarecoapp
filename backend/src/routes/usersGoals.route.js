@@ -7,13 +7,11 @@ import { userPassJwt } from "../middlewares/userPassJwt.js";
 const usersGoalsController = new UserGoalsController(usersGoalsRepository, usersRepository, goalsRepository);
 const router = Router();
 
-// Add the getUserGoals endpoint
 router.get("/getusergoals/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getUserGoals);
-router.get("/getusergoalswithstatus/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getGoalsWithStatus);
+router.get("/getgoalslevelsmedals/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getGoalsLevelsMedals);
 router.delete("/deleteusergoal/:uid/:gid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.deleteUserGoal);
 router.get("/getusergoalstats/:uid/:ugid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getUserGoalsStats);
 
-// Add the update-progress endpoint
 router.post("/update-progress", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.updateUserGoal);
 router.post("/saveusergoal/:uid/:gid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.saveUserGoal);
 router.get("/checkusergoalexist/:uid/:gid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.checkUserGoalExist);

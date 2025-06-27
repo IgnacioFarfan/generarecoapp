@@ -9,7 +9,7 @@ const goalsSchema = new mongoose.Schema({
     time: Number,
     distance: Number,
     is_groupal: { type: Boolean, default: false },
-    icon: String,
+    icon: { type: String, default: "http://192.168.100.48:5000/icono primer brote.png" },
     position: Number
 });
 
