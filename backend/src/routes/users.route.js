@@ -10,12 +10,13 @@ import { uploads } from "../middlewares/multer.js";
 const usersController = new UsersController(usersRepository);
 const router = Router();
 
-router.post("/login", isSessionOn(), passportCall("login"), handlePolicies(["PUBLIC"]), usersController.userSigninOrLogin);
-router.post("/signin", isSessionOn(), passportCall("signin"), handlePolicies(["PUBLIC"]), usersController.userSigninOrLogin);
-router.post("/gstrategy", isSessionOn(), passportCall("google"), handlePolicies(["PUBLIC"]), usersController.userSigninOrLogin);
+router.post("/login", isSessionOn(), passportCall("login"), handlePolicies(["PUBLIC"]), usersController.userLogin);
+router.post("/signin", isSessionOn(), passportCall("signin"), handlePolicies(["PUBLIC"]), usersController.userSignin);
+router.post("/gstrategy", isSessionOn(), passportCall("google"), handlePolicies(["PUBLIC"]), usersController.userGoogleSigninOrLogin);
 router.get("/logout", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.userLogout);
+router.get("/activateuser/:uid", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.updateUserStatus);
 
-router.get("/passrestoration/:email", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.passRestoration);
+router.get("/passrestoration/:uid/:hashedpass", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.passRestoration);
 router.post("/forgot", isSessionOn(), handlePolicies(["PUBLIC"]), usersController.userForgotPass);
 
 router.get("/getusers", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.getAllUsers);
@@ -26,6 +27,7 @@ router.get("/getusermedal/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), user
 router.put("/avatar/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), uploads.single("avatar"), usersController.updateUserAvatar);
 router.put("/updateuserstatus/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserStatus);
 router.put("/updateuser", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUser);
+router.put("/deactivateuser/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.deactivateUser);
 router.put("/updateusertotaldistance/:uid/:distance", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserTotalKilometers);
 router.put("/updateuserpassword", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserPassword);
 router.put("/updateusermedal/:uid/:medal", userPassJwt(), handlePolicies(["PUBLIC"]), usersController.updateUserMedal);

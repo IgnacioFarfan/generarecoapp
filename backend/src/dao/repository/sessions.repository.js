@@ -123,6 +123,14 @@ export default class SessionsRepository {
         return res.length > 0 ? res[0].totalTime : 0;
     }
 
+    getUserTotalKmts = async (uid) => {
+        const res = await this.sessionsModel.aggregate([
+            { $match: { user: new mongoose.Types.ObjectId(String(uid)) } },
+            { $group: { _id: null, userTotalKmts: { $sum: '$distance' } } }
+        ]).exec();        
+        return res.length > 0 ? res[0].userTotalKmts : 0;
+    }
+
     getUserTotalVelocity = async (uid) => {
         const res = await this.sessionsModel.aggregate([
             { $match: { user: new mongoose.Types.ObjectId(String(uid)) } },

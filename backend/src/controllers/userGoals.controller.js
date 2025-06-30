@@ -50,6 +50,22 @@ export default class UserGoalsController {
         }
     }
 
+    getUserMedalProgress = async (req, res, next) => {
+        const { uid } = req.params;
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `ID de usuario no recibido.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const medalProgress = await this.usersGoalsRepo.getMedals(uid);
+            res.status(200).send(medalProgress)
+        } catch (error) {
+            next(error);
+        }
+    }
+
     checkUserGoalExist = async (req, res, next) => {
         const { uid, gid } = req.params;
         try {

@@ -121,10 +121,18 @@ const apiService = {
     }
   },
 
+  deactivateUser: async (uid) => {
+    try {
+      const response = await apiClient.put(apiConfig.endpoints.deactivateUser(uid));
+      return response;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   getUser: async (userId) => {
     try {
       const response = await apiClient.get(apiConfig.endpoints.getUser(userId));
-
       return response;
     } catch (error) {
       throw handleApiError(error);
@@ -143,6 +151,14 @@ const apiService = {
   getUserTotalTime: async (uid) => {
     try {
       return await apiClient.get(apiConfig.endpoints.getUserTotalTime(uid));
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  getUserTotalKmts: async (uid) => {
+    try {
+      return await apiClient.get(apiConfig.endpoints.getUserTotalKmts(uid));
     } catch (error) {
       throw handleApiError(error);
     }
@@ -214,6 +230,15 @@ const apiService = {
     }
   },
 
+  getUserMedalProgress: async (userId) => {
+    try {
+      const response = await apiClient.get(apiConfig.endpoints.getUserMedalProgress(userId));
+      return response;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   updateUserMedal: async (userId, newMedal) => {
     try {
       const response = await apiClient.put(apiConfig.endpoints.updateUserMedal(userId, newMedal));
@@ -226,6 +251,15 @@ const apiService = {
   updateUser: async (userData) => {
     try {
       return await apiClient.put(apiConfig.endpoints.updateUser, userData);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  restorePass: async (email, password) => {
+    try {
+      const response = await apiClient.post(apiConfig.endpoints.restorePass, { email, password });
+      return response;
     } catch (error) {
       throw handleApiError(error);
     }

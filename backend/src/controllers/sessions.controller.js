@@ -155,6 +155,22 @@ export default class ProductsController {
         }
     }
 
+    getUserTotalKmts = async (req, res, next) => {
+        const { uid } = req.params;
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `Faltan datos o están erróneos.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const userTotalKmts = await this.sessionsRepo.getUserTotalKmts(uid);
+            res.status(200).send({userTotalKmts: userTotalKmts})
+        } catch (error) {
+            next(error)
+        }
+    }
+
     getUserDataSpeedAvg = async (req, res, next) => {
         const { uid, period } = req.params;
         try {

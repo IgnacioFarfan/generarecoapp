@@ -5,9 +5,11 @@ export default {
     // user endpoints
     login: '/users/login',
     register: '/users/signin',
+    restorePass: '/users/forgot',
     googleSignup: '/users/gstrategy',
     getUsers: '/users/getusers',
     getUser: (uid) => `/users/getuser/${uid}`,
+    deactivateUser: (uid) => `/users/deactivateuser/${uid}`,
     getUserTotalDistance: (userId) => `/users/getusertotaldistance/${userId}`,
     getUserMedal: (userId) => `/users/getusermedal/${userId}`,
     updateUserMedal: (userId, newMedal) => `/users/updateusermedal/${userId}/${newMedal}`,
@@ -21,6 +23,7 @@ export default {
     getUserSessions: (userId) => `/sessions/getuserssessions/${userId}`,
     getUserStatsByPeriod: (userId, period) => `/sessions/getuserstats/${userId}/${period}`,
     getUserTotalTime: (uid) => `/sessions/getusertotaltime/${uid}`,
+    getUserTotalKmts: (uid) => `/sessions/getusertotalkmts/${uid}`,
     getUserTotalVelocity: (uid) => `/sessions/getusertotalvelocity/${uid}`,
     getUserTotalSessions: (uid) => `/sessions/getusertotalsessions/${uid}`,
     getUserPeriodDataSpeedAvg: (uid, period) => `/sessions/getuserdataspeedavg/${uid}/${period}`,
@@ -40,6 +43,7 @@ export default {
     saveUserGoal: (userId, goalId) => `/usersgoals/saveusergoal/${userId}/${goalId}`,
     getUserGoals: (userId) => `/usersgoals/getusergoals/${userId}`,
     getGoalsLevelsMedals: (uid) => `/usersgoals/getgoalslevelsmedals/${uid}`,
+    getUserMedalProgress: (uid) => `/usersgoals/getusermedalprogress/${uid}`,
     deleteUserGoal: (uid, gid) => `/usersgoals/deleteusergoal/${uid}/${gid}`,// _id del modelo Goals, no del modelo de userGoals
     getUserGoalsStats: (userId, ugid) => `/usersgoals/getusergoalstats/${userId}/${ugid}`,// _id del modelo Goals, no del modelo de userGoals
     updateFinnishUserGoal: (uid, ugid, date) => `/usersgoals/updatefinnishusergoal/${uid}/${ugid}/${date}`,// actualiza el userGoal del usuario colocando la fecha en el campo finnish. dando por finalizado el desafío

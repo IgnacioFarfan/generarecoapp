@@ -9,12 +9,12 @@ export default class UsersRepository {
     };
 
     getUser = async (id) => {
-        let user = await this.usersModel.findOne({ $or: [{ userName: id }, { email: id }, { idGoogle: id }] }).populate('medal');
+        let user = await this.usersModel.findOne({ $or: [{ userName: id }, { email: id }, { idGoogle: id }] });
         return user;
     };
 
     getUserById = async (uid) => {
-        let user = await this.usersModel.findById(uid).populate('medal');
+        let user = await this.usersModel.findById(uid);
         return user;
     };
 

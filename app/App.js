@@ -13,6 +13,7 @@ import HistoryScreen from './screens/HistoryScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import UpdateUserScreen from './screens/UpdateUserScreen';
 import SignInScreen from './screens/SignInScreen';
+import PasswordRestoration from './screens/PasswordRestoration';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
       <Stack.Navigator initialRouteName='Login'>
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={SignInScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="PasswordRestoration" component={PasswordRestoration} options={{ headerShown: false }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Progress" component={ProgressScreen} options={{ headerShown: false }} />

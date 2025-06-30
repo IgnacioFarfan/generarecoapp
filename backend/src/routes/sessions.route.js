@@ -14,6 +14,7 @@ router.get("/getuserstats/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"
 router.get("/getusertotaltime/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalTime);
 router.get("/getusertotalvelocity/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalVelocity);
 router.get("/getusertotalsessions/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalSessions);
+router.get("/getusertotalkmts/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserTotalKmts);
 
 router.get("/getuserdatadistance/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserDataDistance);
 router.get("/getuserdatatime/:uid/:period", userPassJwt(), handlePolicies(["PUBLIC"]), sessionsController.getUserDataTime);

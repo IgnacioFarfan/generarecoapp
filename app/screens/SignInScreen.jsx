@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, StatusBar, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
@@ -200,10 +200,11 @@ export default function SignInScreen() {
                 setError('');
                 toggleAuthMode();
 
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'Welcome' }],
-                });
+                Alert.alert(
+                    'Registro exitoso!',
+                    'Revisa tu correo y activa tu cuenta para empezar.',
+                    [{ text: 'Aceptar', onPress: () => { toggleAuthMode } }]
+                );
             }
         } catch (err) {
             console.log('Signup error:', err);
@@ -236,6 +237,10 @@ export default function SignInScreen() {
         setEmail('');
         setConfirmPassword('');
     };
+
+    const handlePassRestoration = () => {
+        navigation.navigate('PasswordRestoration');
+    }
 
     return (
         <>
@@ -393,6 +398,13 @@ export default function SignInScreen() {
                             </TouchableOpacity>
                         </View>
                     </View>
+
+                    {!isSignupMode && <View style={appStyles.forgotPassTextContainer}>
+                        <Text style={appStyles.createAccountText}> ¿Olvidaste tu contraseña? </Text>
+                        <TouchableOpacity onPress={handlePassRestoration}>
+                            <Text style={appStyles.createAccountLink}>Restáurala aquí</Text>
+                        </TouchableOpacity>
+                    </View>}
                 </View>
             }
         </>

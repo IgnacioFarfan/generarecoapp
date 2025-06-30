@@ -9,6 +9,7 @@ const router = Router();
 
 router.get("/getusergoals/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getUserGoals);
 router.get("/getgoalslevelsmedals/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getGoalsLevelsMedals);
+router.get("/getusermedalprogress/:uid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getUserMedalProgress);
 router.delete("/deleteusergoal/:uid/:gid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.deleteUserGoal);
 router.get("/getusergoalstats/:uid/:ugid", userPassJwt(), handlePolicies(["PUBLIC"]), usersGoalsController.getUserGoalsStats);
 
