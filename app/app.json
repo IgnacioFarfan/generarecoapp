@@ -2,12 +2,12 @@
   "expo": {
     "jsEngine": "hermes",
     "name": "generareco",
-    "slug": "geapp",
-    "owner": "hector039",
+    "slug": "react-native-fitness-app",
+    "owner": "yosoynacho",
     "scheme": "com.generareco",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/favicon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -59,7 +59,7 @@
         "version": "21.0.0"
       },
       "eas": {
-        "projectId": "74a11496-dae0-4931-b37d-d90a9883412a"
+        "projectId": "0056f2b6-5d55-4eb5-a39d-a4d409381906"
       }
     }
   }

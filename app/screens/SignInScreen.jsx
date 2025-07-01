@@ -5,9 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 // import NetInfo from '@react-native-community/netinfo';
 
-import * as Google from 'expo-auth-session/providers/google';
+// import * as Google from 'expo-auth-session/providers/google';
 //import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from "expo-web-browser";
+//import * as WebBrowser from "expo-web-browser";
 
 // Import API service and config
 import apiService from '../services/api.service';
@@ -15,7 +15,7 @@ import apiService from '../services/api.service';
 //appStyles
 import { appStyles } from '../styles/appStyles';
 
-WebBrowser.maybeCompleteAuthSession();
+// WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInScreen() {
     const navigation = useNavigation();
@@ -86,11 +86,11 @@ export default function SignInScreen() {
     console.log('URI de Redirección para Google:', redirectUri);
      */
 
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: process.env.EXPO_PUBLIC_ANDROID_ID,
-        useProxy: false,
-        redirectUri: "com.generareco:/",
-    });
+    // const [request, response, promptAsync] = Google.useAuthRequest({
+    //     androidClientId: process.env.EXPO_PUBLIC_ANDROID_ID,
+    //     useProxy: false,
+    //     redirectUri: "com.generareco:/",
+    // });
 
     /* 
     useEffect(() => {
@@ -99,36 +99,36 @@ export default function SignInScreen() {
     }, [request]);
      */
 
-    useEffect(() => {
-        if (response?.type === 'success') {
-            const { authentication } = response;
-            console.log('Token:', authentication?.accessToken);
-            if (authentication?.accessToken) getGoogleUserInfo(authentication.accessToken)
-        } else if (response?.type === 'error') {
-            console.error('Error en login con Google:', response.error);
-        }
-    }, [response]);
+    // useEffect(() => {
+    //     if (response?.type === 'success') {
+    //         const { authentication } = response;
+    //         console.log('Token:', authentication?.accessToken);
+    //         if (authentication?.accessToken) getGoogleUserInfo(authentication.accessToken)
+    //     } else if (response?.type === 'error') {
+    //         console.error('Error en login con Google:', response.error);
+    //     }
+    // }, [response]);
 
-    const getGoogleUserInfo = async (token) => {
-        try {
-            const response = await fetch("https://www.googleapis.com/userinfo/v2/me", { headers: { Authorization: `Bearer ${token}` }, },);
-            const user = await response.json();
-            console.log(user);
-            if (user) {
-                const newUser = await apiService.googleSignup(user.id, user.given_name, user.family_name, user.email);
-                if (newUser) {
-                    setError('');
+    // const getGoogleUserInfo = async (token) => {
+    //     try {
+    //         const response = await fetch("https://www.googleapis.com/userinfo/v2/me", { headers: { Authorization: `Bearer ${token}` }, },);
+    //         const user = await response.json();
+    //         console.log(user);
+    //         if (user) {
+    //             const newUser = await apiService.googleSignup(user.id, user.given_name, user.family_name, user.email);
+    //             if (newUser) {
+    //                 setError('');
 
-                    navigation.reset({
-                        index: 0,
-                        routes: [{ name: 'Welcome' }],
-                    });
-                }
-            }
-        } catch (err) {
-            console.log('Google auth error', err);
-        }
-    }
+    //                 navigation.reset({
+    //                     index: 0,
+    //                     routes: [{ name: 'Welcome' }],
+    //                 });
+    //             }
+    //         }
+    //     } catch (err) {
+    //         console.log('Google auth error', err);
+    //     }
+    // }
 
     const handleLogin = async () => {
         try {
@@ -375,13 +375,13 @@ export default function SignInScreen() {
                     }
 
                     <View style={appStyles.socialContainer}>
-                        {!isSignupMode && (
+                        {/* {!isSignupMode && (
                             <TouchableOpacity style={appStyles.socialButton} onPress={() => {
                                 promptAsync()
                             }}>
                                 <Text style={appStyles.buttonText}>Continuar con Google</Text>
                             </TouchableOpacity>
-                        )}
+                        )} */}
                         <View style={appStyles.createAccountTextContainer}>
                             <Text style={appStyles.createAccountText}>
                                 {isSignupMode ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}{' '}
