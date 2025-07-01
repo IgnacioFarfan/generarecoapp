@@ -18,7 +18,7 @@ const transport = nodemailer.createTransport({
 })
 
 export async function welcomeWithActivationMailer(user) {
-    let htmlTemplate = fs.readFileSync('src/tools/templates/welcome-activation-template.html', 'utf8');
+    let htmlTemplate = fs.readFileSync('src/tools/templates/email-welcome-activation-template.html', 'utf8');
     const htmlTemplateEdited = editWord(htmlTemplate, 'pathToValidation', `http://localhost:5000/api/users/activateuser/${user._id}`)
     try {
         await transport.verify();
@@ -40,7 +40,7 @@ export async function welcomeWithActivationMailer(user) {
 }
 
 export async function welcomeMailer(user) {
-    let htmlTemplate = fs.readFileSync('src/tools/templates/welcome-template.html', 'utf8');
+    let htmlTemplate = fs.readFileSync('src/tools/templates/email-welcome-template.html', 'utf8');
     try {
         await transport.verify();
         console.log("El servidor está listo para enviar mails");
@@ -61,7 +61,7 @@ export async function welcomeMailer(user) {
 }
 
 export async function passRestorationMailer(user, password) {
-    let htmlTemplate = fs.readFileSync('src/tools/templates/passrestoration-template.html', 'utf8');
+    let htmlTemplate = fs.readFileSync('src/tools/templates/email-passrestoration-template.html', 'utf8');
     const htmlTemplateEdited = editWord(htmlTemplate, 'pathToValidation', `http://localhost:5000/api/users/passrestoration/${user._id}/${password}`)
     try {
         await transport.verify();
@@ -83,7 +83,7 @@ export async function passRestorationMailer(user, password) {
 }
 
 export async function deactivateUserMailer(user) {
-    let htmlTemplate = fs.readFileSync('src/tools/templates/deactivate-user-template.html', 'utf8');
+    let htmlTemplate = fs.readFileSync('src/tools/templates/email-deactivate-user-template.html', 'utf8');
     //const htmlTemplateEdited = editWord(htmlTemplate, 'pathToValidation', `http://localhost:5000/users/passrestoration/${user._id}/${password}`)
     try {
         await transport.verify();
