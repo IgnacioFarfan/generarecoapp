@@ -20,6 +20,8 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Run build_dev.sh
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: cd app && bash build_dev.sh
 
   build-preview:
@@ -35,4 +37,6 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Run build_preview.sh
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: cd app && bash build_preview.sh
