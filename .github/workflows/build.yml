@@ -1,0 +1,84 @@
+name: Build APKs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Create .env file from secrets
+        run: |
+          echo "EXPO_PUBLIC_ANDROID_ID=${{ secrets.EXPO_PUBLIC_ANDROID_ID }}" > app/.env
+          echo "EXPO_PUBLIC_API_URL=${{ secrets.EXPO_PUBLIC_API_URL }}" >> app/.env
+      - name: Install dependencies
+        run: cd app && npm ci
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Run build_dev.sh
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: cd app && bash build_dev.sh
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          tag_name: ${{ github.sha }}
+          name: Release ${{ github.sha }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload APK to Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          files: app/devbuild.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Create .env file from secrets
+        run: |
+          echo "EXPO_PUBLIC_ANDROID_ID=${{ secrets.EXPO_PUBLIC_ANDROID_ID }}" > app/.env
+          echo "EXPO_PUBLIC_API_URL=${{ secrets.EXPO_PUBLIC_API_URL }}" >> app/.env
+      - name: Install dependencies
+        run: cd app && npm ci
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Run build_preview.sh
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: cd app && bash build_preview.sh
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          tag_name: ${{ github.sha }}
+          name: Release ${{ github.sha }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload APK to Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          files: app/previewbuild.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
