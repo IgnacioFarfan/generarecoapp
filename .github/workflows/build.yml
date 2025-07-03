@@ -17,8 +17,6 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: cd app && npm ci
-      - name: Install root dependencies
-        run: npm ci
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Run build_dev.sh
@@ -34,8 +32,6 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: cd app && npm ci
-      - name: Install root dependencies
-        run: npm ci
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Run build_preview.sh
