@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native';
 
 export const profileStyles = StyleSheet.create({
     container: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
@@ -258,13 +257,12 @@ export const profileStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     treeContainer: {
-        flex: 1,
         width: '80%',
         backgroundColor: 'transparent',
         borderRadius: 16,
         padding: 20,
         alignItems: 'center',
-        marginTop: 90,
+        marginVertical: 30,
     },
     treeImage: {
         width: 250,
@@ -293,4 +291,54 @@ export const profileStyles = StyleSheet.create({
         fontSize: 16,
         color: 'white'
     },
+    medalContainer: {
+        width: '90%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(92, 92, 92, 0.27)',
+        borderRadius: 20,
+        marginBottom: 90
+    },
+    medalItem: {
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        borderRadius: 16,
+        padding: 10,
+        alignItems: 'center',
+    },
+    medalIcon: {
+        width: 50,
+        height: 50,
+        tintColor: '#467d2a', // Default color
+    },
+    medalTitle: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#467d2a',
+    },
+    medalTitleDescription: {
+        fontSize: 20,
+        color: 'white',
+        marginBottom: 20
+    },
+    medalInfo: {
+        flexDirection: 'column',
+        gap: 10,
+        alignItems: 'center',
+        padding: 15
+    },
+    deactivateContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 35,
+        gap: 10
+    },
+    deactivateText: {
+        color: 'white'
+    },
+    deactivateLinkButtonText: {
+        color: 'red',
+        textDecorationLine: 'underline'
+    }
 });

@@ -66,4 +66,8 @@ export default class UsersRepository {
         return result;
     };
 
+    updateUserMedal = async (uid, medal) => {
+        await this.usersModel.findByIdAndUpdate(uid, {medal: parseInt(medal)});
+        return;
+    };
 }

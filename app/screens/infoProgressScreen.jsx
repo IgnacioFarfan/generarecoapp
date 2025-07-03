@@ -93,9 +93,9 @@ const InfoProgressScreen = () => {
 
     const fetchUserData = async (uid) => {
         try {
-            const user = await apiService.getUser(uid);
-            // Distancia total del usuario agregada como un campo extra en el modelo mismo de usuario
-            if (user.data.totalKilometers) setUserTotalDistance(user.data.totalKilometers);
+            // Distancia total del usuario obtenida de la suma de las sesiones
+            const userKilometers = await apiService.getUserTotalKmts(uid);
+            if (userKilometers.data.userTotalKmts) setUserTotalDistance(userKilometers.data.userTotalKmts);
             //obtengo el tiempo total (suma de los tiempos de todas las sessiones)
             const userTime = await apiService.getUserTotalTime(uid);
             if (userTime.data.userTotalTime) setUserTotalTime(userTime.data.userTotalTime)

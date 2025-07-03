@@ -46,7 +46,7 @@ const ProgressScreen = () => {
                     <Text style={[profileStyles.tabText, activeTab === 'info' ? profileStyles.activeTabText : null]}>Info</Text>
                 </TouchableOpacity>
             </View>
-
+            
             {activeTab === 'info' ? <InfoProgressScreen /> : <TreeProgressScreen />}
 
 

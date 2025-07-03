@@ -10,7 +10,7 @@ import { updateUserStyles } from '../styles/updateUserStyles';
 
 const UpdateUserScreen = () => {
     const route = useRoute();
-    const { _id, userName, firstName, lastName, email, age, range, gender, height, weight } = route.params;
+    const { _id, userName, firstName, lastName, email, age, gender, height, weight } = route.params;
 
     const navigation = useNavigation();
 
@@ -18,11 +18,10 @@ const UpdateUserScreen = () => {
     const [userFirstName, setFirstName] = useState(firstName);
     const [userLastName, setLastName] = useState(lastName);
     const [userEmail, setEmail] = useState(email);
-    const [userAge, setUserAge] = useState(String(age));
-    const [userRange, setUserRange] = useState(range);
+    const [userAge, setUserAge] = useState(age ? String(age) : '');
     const [userGender, setUserGender] = useState(gender);
-    const [userHeight, setUserHeight] = useState(String(height));
-    const [userWeight, setUserWeight] = useState(String(weight));
+    const [userHeight, setUserHeight] = useState(height ? String(height) : '');
+    const [userWeight, setUserWeight] = useState(weight ? String(weight) : '');
 
     const [userPassword, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -74,13 +73,12 @@ const UpdateUserScreen = () => {
                 lastName: userLastName,
                 email: userEmail,
                 age: userAge,
-                range: userRange,
                 gender: userGender,
                 height: userHeight,
                 weight: userWeight
             });
 
-            console.log('usuario actualizado:', response.data);
+            //console.log('usuario actualizado:', response.data);
             if (response.data) {
                 Alert.alert(
                     'OK!',
@@ -89,7 +87,7 @@ const UpdateUserScreen = () => {
                         {
                             text: 'Aceptar', onPress: navigation.reset({
                                 index: 0,
-                                routes: [{ name: 'Profile' }],
+                                routes: [{ name: 'Progress' }],
                             })
                         }
                     ]
@@ -135,6 +133,10 @@ const UpdateUserScreen = () => {
             }
         }
 
+    }
+
+    const handleBackUserInfo = () => {
+        navigation.navigate('Progress');
     }
 
     return (
@@ -249,36 +251,10 @@ const UpdateUserScreen = () => {
                     </Picker>
                 </View>
 
-                <Text style={updateUserStyles.subtitle}>Perfil deportista:</Text>
-                <View style={updateUserStyles.rangeContainer}>
-                    <TouchableOpacity
-                        style={[updateUserStyles.rangeButton, userRange === 'Principiante' && updateUserStyles.rangeButtonSelected]}
-                        onPress={() => setUserRange('Principiante')} >
-                        <Text style={[updateUserStyles.rangeButtonText, userRange === 'Principiante' && updateUserStyles.rangeButtonTextSelected]} >
-                            Principiante
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[updateUserStyles.rangeButton, userRange === 'Intermedio' && updateUserStyles.rangeButtonSelected]}
-                        onPress={() => setUserRange('Intermedio')} >
-                        <Text style={[updateUserStyles.rangeButtonText, userRange === 'Intermedio' && updateUserStyles.rangeButtonTextSelected]} >
-                            Intermedio
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[updateUserStyles.rangeButton, userRange === 'Avanzado' && updateUserStyles.rangeButtonSelected]}
-                        onPress={() => setUserRange('Avanzado')} >
-                        <Text style={[updateUserStyles.rangeButtonText, userRange === 'Avanzado' && updateUserStyles.rangeButtonTextSelected]} >
-                            Avanzado
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
                 <TouchableOpacity style={updateUserStyles.doneButton} onPress={() => handleUpdate()} >
                     <Text style={updateUserStyles.doneButtonText}>Actualizar mi perfil</Text>
                 </TouchableOpacity>
+
                 <Text style={updateUserStyles.subtitle}>Cambiar contraseña</Text>
                 <TextInput
                     style={updateUserStyles.input}
@@ -303,6 +279,10 @@ const UpdateUserScreen = () => {
 
                 <TouchableOpacity style={updateUserStyles.doneButton} onPress={() => handleUpdatePassword()}>
                     <Text style={updateUserStyles.doneButtonText}>Cambiar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleBackUserInfo}>
+                    <Text style={updateUserStyles.backLink}>Volver</Text>
                 </TouchableOpacity>
 
             </ScrollView>

@@ -26,6 +26,19 @@ const MapScreen = () => {
     const [initialRegion, setInitialRegion] = useState(null);
     const [userId, setUserId] = useState(null);
 
+    const [kilometer, setKilometer] = useState(0);
+    const [seconds, setSeconds] = useState(0);
+    const [isRunning, setIsRunning] = useState(false);
+    const [markerPosition, setMarkerPosition] = useState(null);
+    const [pathCoordinates, setPathCoordinates] = useState([]);
+    const [currentSpeed, setCurrentSpeed] = useState(0);
+    const [countdown, setCountdown] = useState(0);
+    const [tipsModalVisible, setTipsModalVisible] = useState(false);
+    const [tip, setTip] = useState('');
+    const [countdownVisible, setCountdownVisible] = useState(false);
+    const [realGps, setRealGps] = useState(true);
+    const mapViewRef = useRef(null);
+
     useEffect(() => {
         async function getUserData() {
             const { userId } = await getUserTokenAndId(navigation);
@@ -63,25 +76,31 @@ const MapScreen = () => {
         );
     }, []);
 
+    useEffect(() => {
+        let interval = null;
 
-    const [kilometer, setKilometer] = useState(0);
-    const [seconds, setSeconds] = useState(0);
-    const [isRunning, setIsRunning] = useState(false);
-    const [markerPosition, setMarkerPosition] = useState(null);
-    const [pathCoordinates, setPathCoordinates] = useState([]);
-    const [currentSpeed, setCurrentSpeed] = useState(0);
-    const [countdown, setCountdown] = useState(0);
-    const [tipsModalVisible, setTipsModalVisible] = useState(false);
-    const [tip, setTip] = useState('');
-    const [countdownVisible, setCountdownVisible] = useState(false);
-    const [realGps, setRealGps] = useState(true);
-    const mapViewRef = useRef(null);
+        if (isRunning) {
+            interval = setInterval(() => {
+                setSeconds((prevSeconds) => prevSeconds + 1);
+            }, 1000);
+        } else if (!isRunning && interval !== null) {
+            clearInterval(interval);
+        }
+
+        return () => clearInterval(interval);
+    }, [isRunning]);
+
+
 
     // Add a state to track if we should follow the user location
     const [followUserLocation, setFollowUserLocation] = useState(true);
 
     const finishRun = async () => {
         try {
+
+            minutes = Math.floor(seconds / 60);
+            remainingSeconds = seconds % 60;
+
             // Calculate average speed
             const avgSpeed = kilometer > 0 ? (kilometer / (seconds / 3600)) : 0;
 
@@ -101,12 +120,12 @@ const MapScreen = () => {
                 time: seconds
             };
 
-            if (avgSpeed < 20) {// CAMBIAR A MAYOR CUANDO PASE A PRODUCIÓN!
+            if (avgSpeed < 20) {// CAMBIAR A MAYOR CUANDO PASE A PRODUCCIÓN!
                 // guardar session con el condicional de que la velocidad promedio (avgSpeed) sea mayor que 20km/h
                 await apiService.saveSession(sessionData);
                 await apiService.updateUserTotalKilometers(userId, sessionData.distance);
                 console.log('se grabó la sessión:', avgSpeed, 'es mayor que 20kms/h');
-                
+
             }
 
 
@@ -160,12 +179,12 @@ const MapScreen = () => {
         setKilometer((prevKilometer) => prevKilometer + distanceInKm);
     };
 
-    const incrementSeconds = () => {
+    /* const incrementSeconds = () => {
         setSeconds((prevSeconds) => prevSeconds + 1);
-    };
+    }; */
 
     const startChronometer = () => {
-        setCountdown(10);
+        setCountdown(3);
         setCountdownVisible(true);
         const countdownInterval = setInterval(() => {
             setCountdown((prev) => {
@@ -209,7 +228,7 @@ const MapScreen = () => {
                     const speed = position.coords.speed !== null ? position.coords.speed * 3.6 : 0;
                     setCurrentSpeed(speed);
                     incrementKilometer(speed);
-                    incrementSeconds();
+                    //incrementSeconds();
                 }
 
                 // Animate camera if following user location
@@ -233,8 +252,8 @@ const MapScreen = () => {
     }, [followUserLocation, isRunning]);
 
     const kilometerText = kilometer.toFixed(2);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
+    let minutes = Math.floor(seconds / 60);
+    let remainingSeconds = seconds % 60;
     const currentSpeedText = currentSpeed.toFixed(2);
 
     const showTips = () => {
@@ -286,25 +305,8 @@ const MapScreen = () => {
 
                     <View style={mapScreenStyles.tableContainer}>
                         <Text style={mapScreenStyles.tableHeader}>Tiempo  Distancia   Velocidad</Text>
-                        <Text style={mapScreenStyles.tableRow}>{`${minutes}:${remainingSeconds.toString().padStart(2, '0')}          ${kilometerText} km           ${currentSpeedText} km/h`}</Text>
+                        <Text style={mapScreenStyles.tableRow}>{`${minutes}:${remainingSeconds.toString().padStart(2, '0')} mins    ${kilometerText} km           ${currentSpeedText} km/h`}</Text>
                     </View>
-
-                    {/* Media control buttons commented out
-                <View style={mapScreenStyles.row}>
-                    <TouchableOpacity style={mapScreenStyles.button}>
-                        <Icon name="play-back-outline" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={mapScreenStyles.button}>
-                        <Icon name="play-outline" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={mapScreenStyles.button}>
-                        <Icon name="stop-outline" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={mapScreenStyles.button}>
-                        <Icon name="play-forward-outline" size={24} color="#FFFFFF" />
-                    </TouchableOpacity>
-                </View>
-                */}
                 </View>
 
                 {initialRegion ? (

@@ -59,8 +59,8 @@ const HeatmapCalendar = ({ data, startDate, endDate }) => {
             <Modal visible={!!selectedDay} transparent animationType="fade">
                 <View style={styles.modalOverlay}>
                     <View style={styles.tooltipBox}>
-                        <Text style={styles.tooltipText}>Fecha: {selectedDay?.date}</Text>
-                        <Text style={styles.tooltipText}>Conteo: {selectedDay?.count}</Text>
+                        <Text style={styles.tooltipText}>Fecha: {new Date(selectedDay?.date).toLocaleDateString('en-GB', { timeZone: 'UTC' })}</Text>
+                        <Text style={styles.tooltipText}>Distancia: {selectedDay?.count} kmts</Text>
                         <Pressable onPress={() => setSelectedDay(null)}>
                             <Text style={styles.closeButton}>Cerrar</Text>
                         </Pressable>

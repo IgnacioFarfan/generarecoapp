@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, ImageBackground } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/Ionicons';
 import apiService from '../services/api.service';
 import { profileStyles } from '../styles/profileStyles'
 import { getUserTokenAndId } from '../tools/getUserTokenAndId';
@@ -17,7 +16,7 @@ const ProfileScreen = () => {
     async function getUserData() {
       const { userId } = await getUserTokenAndId(navigation);
       fetchUserData(userId);
-      console.log('render in ProfileScreen', userId);
+      //console.log('render in ProfileScreen', userId);
 
     }
     getUserData();
@@ -55,13 +54,37 @@ const ProfileScreen = () => {
     }
   };
 
+  const deactivateUser = async (uid) => {
+    try {
+      const response = await apiService.deactivateUser(uid);
+      if (response && response.status === 200) {
+        Alert.alert(
+          '¡Atención!',
+          'Cuenta desactivada correctamente. Vuelve a loguearte para volver a activarla cuando quieras.',
+          [{ text: 'Aceptar', onPress: () => handleLogout() }]
+        );
+      }
+    } catch (error) {
+      console.error('Failed to load data from API:', error);
+    }
+  };
+
+  const handleConfirmDeactivate = async (uid) => {
+    try {
+      Alert.alert(
+        '¡Atención!',
+        'Seguro quieres desactivar tu cuenta?. (Podrás reactivarla cuando quieras, te esperamos pronto!)',
+        [
+          { text: 'Aceptar', onPress: () => deactivateUser(uid) },
+          { text: 'Cancelar' }
+        ]
+      );
+    } catch (err) {
+      console.error('Error fetching user goals:', err);
+    }
+  }
+
   return (
-    /*  <ImageBackground
-       source={require('../assets/fondo4.jpg')}
-       style={profileStyles.container}
-       resizeMode="cover"
-     >
-  */
     <View style={profileStyles.profileContainer}>
       <Text style={profileStyles.profileTitle}>Perfil de usuario</Text>
       <View style={profileStyles.profileInfoContainer}>
@@ -81,9 +104,15 @@ const ProfileScreen = () => {
             <Text style={profileStyles.logoutButtonText}>Cerrar Sesión</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={profileStyles.deactivateContainer}>
+          <Text style={profileStyles.deactivateText}>Necesitas un descanso?</Text>
+          <TouchableOpacity onPress={() => handleConfirmDeactivate(userData._id)}>
+            <Text style={profileStyles.deactivateLinkButtonText}>Desactivar mi cuenta</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
-    /*  </ImageBackground> */
   );
 };
 

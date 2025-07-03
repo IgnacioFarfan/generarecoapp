@@ -84,6 +84,11 @@ export const updateUserStyles = StyleSheet.create({
         color: 'black',
         fontSize: 16,
     },
+    backLink: {
+        color: '#f5f5f5',
+        textDecorationLine: 'underline',
+        fontSize: 15
+    },
     rangeButtonTextSelected: {
         color: 'white', // Optional: Change text color when selected
         fontWeight: 'bold',

@@ -3,9 +3,9 @@ import indexRoute from "../routes/index.route.js";
 import passport from "passport";
 import initializePassport from "../config/passport.config.js";
 import __dirname from "../tools/utils.js";
-//import cors from "cors";
+import cors from "cors";
 import session from "express-session";
-import { profilesImgPath } from "../public/data/pathProfiles.js";
+import { staticImgPath } from "../public/data/staticImgPath.js";
 import usersGoalsRouter from "../routes/usersGoals.route.js";
  
 /* const corsOptions = {
@@ -15,11 +15,11 @@ import usersGoalsRouter from "../routes/usersGoals.route.js";
 
 export default async function appLoader(app) {
     app.disable('x-powered-by')
-    //app.use(cors(corsOptions));
+    app.use(cors());
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
-    app.use(express.static(__dirname + "/public"));
-    app.use(express.static(profilesImgPath));
+    app.use(express.static(__dirname));
+    app.use(express.static(staticImgPath));
     app.use(session({
         secret: process.env.USERCOOKIESECRET,
         resave: false,

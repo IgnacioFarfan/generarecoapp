@@ -34,22 +34,37 @@ export default class UserGoalsController {
         }
     }
 
-        getGoalsWithStatus = async (req, res, next) => {
-            const { uid } = req.params;
-            try {
-                if (!uid) {
-                    CustomError.createError({
-                        message: `ID de usuario no recibido.`,
-                        code: TErrors.INVALID_TYPES,
-                    });
-                }
-                const userGoalsWithInfo = await this.usersGoalsRepo.getGoalsWithStatus(uid);
-                res.status(200).send(userGoalsWithInfo)
-            } catch (error) {
-                next(error);
+    getGoalsLevelsMedals = async (req, res, next) => {
+        const { uid } = req.params;
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `ID de usuario no recibido.`,
+                    code: TErrors.INVALID_TYPES,
+                });
             }
+            const userGoalsWithInfo = await this.usersGoalsRepo.getGoalsLevelsMedals(uid);
+            res.status(200).send(userGoalsWithInfo)
+        } catch (error) {
+            next(error);
         }
-        
+    }
+
+    getUserMedalProgress = async (req, res, next) => {
+        const { uid } = req.params;
+        try {
+            if (!uid) {
+                CustomError.createError({
+                    message: `ID de usuario no recibido.`,
+                    code: TErrors.INVALID_TYPES,
+                });
+            }
+            const medalProgress = await this.usersGoalsRepo.getMedals(uid);
+            res.status(200).send(medalProgress)
+        } catch (error) {
+            next(error);
+        }
+    }
 
     checkUserGoalExist = async (req, res, next) => {
         const { uid, gid } = req.params;
@@ -102,7 +117,7 @@ export default class UserGoalsController {
     deleteUserGoal = async (req, res, next) => {
         const { uid, gid } = req.params;
         try {
-            if ( !gid || !uid ) {
+            if (!gid || !uid) {
                 CustomError.createError({
                     message: `Faltan datos o están erróneos.`,
                     code: TErrors.INVALID_TYPES,
@@ -125,7 +140,7 @@ export default class UserGoalsController {
     getUserGoalsStats = async (req, res, next) => {
         const { uid, ugid } = req.params;
         try {
-            if ( !ugid || !uid ) {
+            if (!ugid || !uid) {
                 CustomError.createError({
                     message: `Faltan datos o están erróneos.`,
                     code: TErrors.INVALID_TYPES,

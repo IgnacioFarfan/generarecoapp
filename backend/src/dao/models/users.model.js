@@ -11,13 +11,16 @@ const userSchema = new mongoose.Schema({
     idGoogle: { type: String, default: null },
     lastLogin: { type: Date, default: Date.now },
     registerDate: { type: Date, default: Date.now },
-    status: { type: Boolean, default: true },
+    status: { type: Boolean, default: false },
+    wasDeactivated: { type: Boolean, default: false },
     height: Number,
     weight: Number,
     age: Number,
     gender: { type: String, enum: ['Masculino', 'Femenino', 'Otro'], default: 'Otro' },
-    avatar: { type: String, default: "https://localhost:8080/public/data/userguest3.png" },
-    totalKilometers: { type: Number, default: 0 }
+    avatar: { type: String, default: "http://192.168.100.48:5000/userguest3.png" },
+    totalKilometers: { type: Number, default: 0 },
+    trees: { type: Number, default: 0 },
+    medal: { type: Number, default: 0 }
 });
 
 const usersModel = mongoose.model(userCollection, userSchema);

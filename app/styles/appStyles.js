@@ -87,6 +87,11 @@ export const appStyles = StyleSheet.create({
         color: '#f5f5f5',
         textDecorationLine: 'underline',
     },
+    forgotPassTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10
+    },
     errorText: {
         color: 'red',
         fontSize: 16,

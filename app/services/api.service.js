@@ -33,7 +33,7 @@ apiClient.interceptors.request.use(
         }
       }
     } catch (error) {
-      console.error('Error getting token for request:', error);
+      console.log('Error getting token for request:', error);
     }
     return config;
   },
@@ -97,7 +97,7 @@ const apiService = {
   signup: async (username, password, firstName, lastName, email) => {
     try {
       const response = await apiClient.post(apiConfig.endpoints.register, { username, password, firstName, lastName, email })
-      
+
       if (response.data && response.data.id) {
         await saveUserTokenAndId(response.data.token, response.data.id)
         console.log('User ID saved:', response.data.id, 'user token saved:', response.data.token);
@@ -121,10 +121,18 @@ const apiService = {
     }
   },
 
+  deactivateUser: async (uid) => {
+    try {
+      const response = await apiClient.put(apiConfig.endpoints.deactivateUser(uid));
+      return response;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   getUser: async (userId) => {
     try {
       const response = await apiClient.get(apiConfig.endpoints.getUser(userId));
-
       return response;
     } catch (error) {
       throw handleApiError(error);
@@ -148,6 +156,14 @@ const apiService = {
     }
   },
 
+  getUserTotalKmts: async (uid) => {
+    try {
+      return await apiClient.get(apiConfig.endpoints.getUserTotalKmts(uid));
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   getUserTotalVelocity: async (uid) => {
     try {
       return await apiClient.get(apiConfig.endpoints.getUserTotalVelocity(uid));
@@ -157,7 +173,7 @@ const apiService = {
   },
 
   getUserTotalSessions: async (uid) => {
-try {
+    try {
       return await apiClient.get(apiConfig.endpoints.getUserTotalSessions(uid));
     } catch (error) {
       throw handleApiError(error);
@@ -205,9 +221,45 @@ try {
     }
   },
 
+  getUserMedal: async (userId) => {
+    try {
+      const response = await apiClient.get(apiConfig.endpoints.getUserMedal(userId));
+      return response;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  getUserMedalProgress: async (userId) => {
+    try {
+      const response = await apiClient.get(apiConfig.endpoints.getUserMedalProgress(userId));
+      return response;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  updateUserMedal: async (userId, newMedal) => {
+    try {
+      const response = await apiClient.put(apiConfig.endpoints.updateUserMedal(userId, newMedal));
+      return response;
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
   updateUser: async (userData) => {
     try {
       return await apiClient.put(apiConfig.endpoints.updateUser, userData);
+    } catch (error) {
+      throw handleApiError(error);
+    }
+  },
+
+  restorePass: async (email, password) => {
+    try {
+      const response = await apiClient.post(apiConfig.endpoints.restorePass, { email, password });
+      return response;
     } catch (error) {
       throw handleApiError(error);
     }
@@ -223,9 +275,9 @@ try {
       const response = await apiClient.post(apiConfig.endpoints.saveSession, sessionData);
       return response;
     } catch (error) {
-      console.error('API Service - saveSession error:', error);
+      console.log('API Service - saveSession error:', error);
       if (error.response) {
-        console.error('API Service - Error response:', error.response.status, error.response.data);
+        console.log('API Service - Error response:', error.response.status, error.response.data);
       }
       throw handleApiError(error);
     }
@@ -250,7 +302,7 @@ try {
       const response = await apiClient.get(apiConfig.endpoints.getUserStatsByPeriod(userId, period));
       return response;
     } catch (error) {
-      console.error(`Error fetching user stats for period ${period}:`, error);
+      console.log(`Error fetching user stats for period ${period}:`, error);
       // Return a default response structure to prevent errors
       return {
         data: {
@@ -322,7 +374,7 @@ try {
       const response = await apiClient.post(apiConfig.endpoints.saveUserGoal(uid, gid));
       return response;
     } catch (error) {
-      console.error('API Service - Error saving goal:', error);
+      console.log('API Service - Error saving goal:', error);
       throw handleApiError(error);
     }
   },
@@ -332,17 +384,17 @@ try {
       const response = await apiClient.get(apiConfig.endpoints.getUserGoals(userId));
       return response;
     } catch (error) {
-      console.error('Error getting user goals:', error);
+      console.log('Error getting user goals:', error);
       throw error;
     }
   },
 
-  getGoalsWithStatus: async (uid) => {
+  getGoalsLevelsMedals: async (uid) => {
     try {
-      const response = await apiClient.get(apiConfig.endpoints.getGoalsWithStatus(uid));
+      const response = await apiClient.get(apiConfig.endpoints.getGoalsLevelsMedals(uid));
       return response;
     } catch (error) {
-      console.error('Error getting user goals:', error);
+      console.log('Error getting user goals:', error);
       throw error;
     }
   },
@@ -352,7 +404,7 @@ try {
       const response = await apiClient.get(apiConfig.endpoints.checkUserGoalExist(uid, gid));
       return response;
     } catch (error) {
-      console.error('Error getting user goals:', error);
+      console.log('Error getting user goals:', error);
       throw error;
     }
   },
@@ -361,7 +413,7 @@ try {
       const response = await apiClient.get(apiConfig.endpoints.getGoalsByUserLevel(userId));
       return response;
     } catch (error) {
-      console.error('Error getting user goals:', error);
+      console.log('Error getting user goals:', error);
       throw error;
     }
   },
@@ -400,9 +452,9 @@ try {
       console.log('API Service - Goal assigned successfully:', response.data);
       return response;
     } catch (error) {
-      console.error('API Service - Error assigning goal to user:', error);
+      console.log('API Service - Error assigning goal to user:', error);
       if (error.response) {
-        console.error('API Service - Error response:', error.response.status, error.response.data);
+        console.log('API Service - Error response:', error.response.status, error.response.data);
       }
       throw handleApiError(error);
     }
@@ -442,7 +494,7 @@ try {
       });
       return response;
     } catch (error) {
-      console.error('Error updating user goal progress:', error);
+      console.log('Error updating user goal progress:', error);
       throw error;
     }
   },
@@ -451,7 +503,7 @@ try {
       const response = await apiClient.get(apiConfig.endpoints.getGoals());
       return response;
     } catch (error) {
-      console.error('Error getting goals:', error);
+      console.log('Error getting goals:', error);
       throw error;
     }
   },
@@ -460,7 +512,7 @@ try {
       const response = await apiClient.delete(apiConfig.endpoints.deleteUserGoal(uid, gid));
       return response;
     } catch (error) {
-      console.error('Error getting user goals:', error);
+      console.log('Error getting user goals:', error);
       throw error;
     }
   },
@@ -469,7 +521,7 @@ try {
       const response = await apiClient.get(apiConfig.endpoints.getUserGoalsStats(userId, ugid));
       return response;
     } catch (error) {
-      console.error('Error getting user goals stats:', error);
+      console.log('Error getting user goals stats:', error);
       throw error;
     }
   },
@@ -478,7 +530,7 @@ try {
       const response = await apiClient.put(apiConfig.endpoints.updateFinnishUserGoal(uid, ugid, date));
       return response;
     } catch (error) {
-      console.error('Error updating user goal:', error);
+      console.log('Error updating user goal:', error);
       throw error;
     }
   },
@@ -487,7 +539,7 @@ try {
       const response = await apiClient.put(apiConfig.endpoints.updateUserTotalKilometers(uid, distance));
       return response;
     } catch (error) {
-      console.error('Error getting user total kilometers:', error);
+      console.log('Error getting user total kilometers:', error);
       throw error;
     }
   },
@@ -497,7 +549,7 @@ try {
       const response = await apiClient.put(apiConfig.endpoints.updateUserPassword, userData);
       return response;
     } catch (error) {
-      console.error('Error actualizando password:', error);
+      console.log('Error actualizando password:', error);
       throw error;
     }
   },
@@ -507,7 +559,7 @@ try {
       const response = await apiClient.put(apiConfig.endpoints.checkAndUpgradeUserLevel(userId));
       return response;
     } catch (error) {
-      console.error('Error getting user total kilometers:', error);
+      console.log('Error getting user total kilometers:', error);
       throw error;
     }
   }
