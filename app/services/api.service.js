@@ -4,9 +4,12 @@ import apiConfig from '../config/api.config';
 import { jwtDecode } from 'jwt-decode';
 import { saveUserTokenAndId } from '../tools/saveUserTokenAndId'
 
+// Set baseURL from environment variable, fallback to default if not set
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.0.31:5000/api";
+
 // Create axios instance with base URL
 const apiClient = axios.create({
-  baseURL: "http://192.168.100.48:5000/api"
+  baseURL: BASE_URL
 });
 
 // Add request interceptor to include auth token and set the correct baseURL
