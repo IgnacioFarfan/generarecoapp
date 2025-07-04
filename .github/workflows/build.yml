@@ -27,31 +27,11 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: cd app && bash build_dev.sh
-      - name: Create Tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag release-${{ github.run_number }}
-          git push origin release-${{ github.run_number }}
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Upload dev APK artifact
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: release-${{ github.run_number }}
-          name: Release ${{ github.run_number }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload APK to Release
-        uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        with:
-          files: app/devbuild.apk
-          tag_name: release-${{ github.run_number }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: dev-apk
+          path: app/devbuild.apk
 
   build-preview:
     runs-on: ubuntu-latest
@@ -73,8 +53,29 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: cd app && bash build_preview.sh
+      - name: Upload preview APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-apk
+          path: app/previewbuild.apk
+
+  release:
+    needs: [build-dev, build-preview]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download dev APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dev-apk
+          path: .
+      - name: Download preview APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-apk
+          path: .
       - name: Create Tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -82,7 +83,6 @@ jobs:
           git push origin release-${{ github.run_number }}
       - name: Create Release
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           tag_name: release-${{ github.run_number }}
           name: Release ${{ github.run_number }}
@@ -90,11 +90,12 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload APK to Release
+      - name: Upload APKs to Release
         uses: softprops/action-gh-release@v2
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
-          files: app/previewbuild.apk
+          files: |
+            devbuild.apk
+            previewbuild.apk
           tag_name: release-${{ github.run_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
