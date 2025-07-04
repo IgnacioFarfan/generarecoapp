@@ -27,12 +27,19 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: cd app && bash build_dev.sh
+      - name: Create Tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag release-${{ github.run_number }}
+          git push origin release-${{ github.run_number }}
       - name: Create Release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
-          tag_name: ${{ github.sha }}
-          name: Release ${{ github.sha }}
+          tag_name: release-${{ github.run_number }}
+          name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
         env:
@@ -42,6 +49,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           files: app/devbuild.apk
+          tag_name: release-${{ github.run_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,12 +73,19 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: cd app && bash build_preview.sh
+      - name: Create Tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag release-${{ github.run_number }}
+          git push origin release-${{ github.run_number }}
       - name: Create Release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
-          tag_name: ${{ github.sha }}
-          name: Release ${{ github.sha }}
+          tag_name: release-${{ github.run_number }}
+          name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
         env:
@@ -80,5 +95,6 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
           files: app/previewbuild.apk
+          tag_name: release-${{ github.run_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
