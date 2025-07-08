@@ -81,6 +81,15 @@ jobs:
           git config user.email "github-actions@github.com"
           git tag release-${{ github.run_number }}
           git push origin release-${{ github.run_number }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release-${{ github.run_number }}
+          name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload APKs to Release
         uses: softprops/action-gh-release@v2
         with:
@@ -90,3 +99,16 @@ jobs:
           tag_name: release-${{ github.run_number }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install rclone
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rclone
+      - name: Setup rclone config
+        run: |
+          echo "$RCLONE_CONF" > rclone.conf
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+      - name: Upload APKs to Google Drive
+        run: |
+          rclone --config=rclone.conf copy devbuild.apk gdrive:/geapp/
+          rclone --config=rclone.conf copy previewbuild.apk gdrive:/geapp/
