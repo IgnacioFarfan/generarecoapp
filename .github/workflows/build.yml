@@ -75,17 +75,20 @@ jobs:
         with:
           name: preview-apk
           path: .
+      - name: Get commit hash
+        id: get_commit
+        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Create Tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag release-${{ github.run_number }}
-          git push origin release-${{ github.run_number }}
+          git tag release-${{ env.commit_hash }}
+          git push origin release-${{ env.commit_hash }}
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: release-${{ github.run_number }}
-          name: Release ${{ github.run_number }}
+          tag_name: release-${{ env.commit_hash }}
+          name: ${{ env.commit_hash }}
           draft: false
           prerelease: false
         env:
@@ -96,7 +99,7 @@ jobs:
           files: |
             devbuild.apk
             previewbuild.apk
-          tag_name: release-${{ github.run_number }}
+          tag_name: release-${{ env.commit_hash }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install rclone
