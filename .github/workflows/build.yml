@@ -88,24 +88,16 @@ jobs:
           else
             echo "Tag release-${{ env.commit_hash }} already exists, skipping tag creation"
           fi
-      - name: Create Release
+      - name: Create or Update Release with APKs
         uses: softprops/action-gh-release@v2
-        id: create_release
-        continue-on-error: true
         with:
           tag_name: release-${{ env.commit_hash }}
           name: ${{ env.commit_hash }}
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload APKs to Release
-        uses: softprops/action-gh-release@v2
-        with:
           files: |
             devbuild.apk
             previewbuild.apk
-          tag_name: release-${{ env.commit_hash }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install rclone
