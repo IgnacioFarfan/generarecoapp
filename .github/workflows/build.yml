@@ -1,66 +1,121 @@
-release:
-  needs: [build-dev, build-preview]
-  runs-on: ubuntu-latest
-  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-  steps:
-    - uses: actions/checkout@v3
-    - name: Download dev APK artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: dev-apk
-        path: .
-    - name: Download preview APK artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: preview-apk
-        path: .
-    - name: Get commit hash
-      id: get_commit
-      run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-    - name: Check if tag exists
-      id: check_tag
-      run: |
-        if git ls-remote --tags origin | grep -q "refs/tags/release-${{ env.commit_hash }}"; then
-          echo "tag_exists=true" >> $GITHUB_ENV
-        else
-          echo "tag_exists=false" >> $GITHUB_ENV
-        fi
-    - name: Create Tag
-      if: env.tag_exists == 'false'
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-        git tag release-${{ env.commit_hash }}
-        git push origin release-${{ env.commit_hash }}
-    - name: Create Release
-      if: env.tag_exists == 'false'
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: release-${{ env.commit_hash }}
-        name: ${{ env.commit_hash }}
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload APKs to Release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          devbuild.apk
-          previewbuild.apk
-        tag_name: release-${{ env.commit_hash }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Install rclone
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y rclone
-    - name: Setup rclone config
-      run: |
-        echo "$RCLONE_CONF" > rclone.conf
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
-    - name: Upload APKs to Google Drive
-      run: |
-        rclone --config=rclone.conf copy devbuild.apk gdrive:/geapp/
-        rclone --config=rclone.conf copy previewbuild.apk gdrive:/geapp/
+name: Build APKs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Create .env file from secrets
+        run: |
+          echo "EXPO_PUBLIC_ANDROID_ID=${{ secrets.EXPO_PUBLIC_ANDROID_ID }}" > app/.env
+          echo "EXPO_PUBLIC_API_URL=${{ secrets.EXPO_PUBLIC_API_URL }}" >> app/.env
+      - name: Install dependencies
+        run: cd app && npm ci
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Run build_dev.sh
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: cd app && bash build_dev.sh
+      - name: Upload dev APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-apk
+          path: app/devbuild.apk
+
+  build-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Create .env file from secrets
+        run: |
+          echo "EXPO_PUBLIC_ANDROID_ID=${{ secrets.EXPO_PUBLIC_ANDROID_ID }}" > app/.env
+          echo "EXPO_PUBLIC_API_URL=${{ secrets.EXPO_PUBLIC_API_URL }}" >> app/.env
+      - name: Install dependencies
+        run: cd app && npm ci
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      - name: Run build_preview.sh
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: cd app && bash build_preview.sh
+      - name: Upload preview APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-apk
+          path: app/previewbuild.apk
+
+  release:
+    needs: [build-dev, build-preview]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download dev APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dev-apk
+          path: .
+      - name: Download preview APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-apk
+          path: .
+      - name: Get commit hash
+        id: get_commit
+        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Create Tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          if ! git rev-parse release-${{ env.commit_hash }} >/dev/null 2>&1; then
+            git tag release-${{ env.commit_hash }}
+            git push origin release-${{ env.commit_hash }}
+          else
+            echo "Tag release-${{ env.commit_hash }} already exists, skipping tag creation"
+          fi
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release-${{ env.commit_hash }}
+          name: ${{ env.commit_hash }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload APKs to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            devbuild.apk
+            previewbuild.apk
+          tag_name: release-${{ env.commit_hash }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install rclone
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rclone
+      - name: Setup rclone config
+        run: |
+          echo "$RCLONE_CONF" > rclone.conf
+        env:
+          RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+      - name: Upload APKs to Google Drive
+        run: |
+          rclone --config=rclone.conf copy devbuild.apk gdrive:/geapp/
+          rclone --config=rclone.conf copy previewbuild.apk gdrive:/geapp/
