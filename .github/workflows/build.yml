@@ -111,5 +111,5 @@ jobs:
           RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       - name: Upload APKs to Google Drive
         run: |
-          rclone --config=rclone.conf copy devbuild.apk gdrive:/geapp/
-          rclone --config=rclone.conf copy previewbuild.apk gdrive:/geapp/
+          rclone --config=rclone.conf copy devbuild.apk drive:/geapp/
+          rclone --config=rclone.conf copy previewbuild.apk drive:/geapp/
