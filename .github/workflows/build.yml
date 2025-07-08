@@ -90,6 +90,8 @@ jobs:
           fi
       - name: Create Release
         uses: softprops/action-gh-release@v2
+        id: create_release
+        continue-on-error: true
         with:
           tag_name: release-${{ env.commit_hash }}
           name: ${{ env.commit_hash }}
