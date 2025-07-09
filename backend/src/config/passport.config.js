@@ -57,10 +57,15 @@ const initializePassport = () => {
                     firstName,
                     lastName,
                     email,
-                    password: createHash(password)
+                    password: createHash(password),
+                    status: process.env.EMAIL_VERIFICATION_REQUIRED === 'true' ? false : true
                 });
 
-                await welcomeWithActivationMailer(newUser);
+                if (process.env.EMAIL_VERIFICATION_REQUIRED === 'true') {
+                    await welcomeWithActivationMailer(newUser);
+                } else {
+                    await welcomeMailer(newUser);
+                }
                 return done(null, newUser);
             } catch (error) {
                 return done(error, null);
@@ -82,9 +87,10 @@ const initializePassport = () => {
                     await usersRepository.updateUserField(user._id, "lastLogin", moment());// actualizo la fecha del logueo
                     return done(null, user)
                 }
-                // si la cuenta no estaba desactivada (osea en false) y el estado era falso, sí impedir el logueo
-                if (!user.status) return done(null, false, { messages: "Activa tu cuenta antes de loguearte." });
-
+                // Permitir login sin verificación de email si la variable de entorno está activa
+                if (!user.status && process.env.EMAIL_VERIFICATION_REQUIRED !== 'false') {
+                    return done(null, false, { messages: "Activa tu cuenta antes de loguearte." });
+                }
                 await usersRepository.updateUserField(user._id, "lastLogin", moment());
                 return done(null, user)
             } catch (error) {
