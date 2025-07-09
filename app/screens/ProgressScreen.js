@@ -22,36 +22,37 @@ const ProgressScreen = () => {
     };
 
     return (
-        <ImageBackground
-            source={require('../assets/fondo3.jpg')}
-            style={profileStyles.container}
-            resizeMode="cover"
-        >
-            <TouchableOpacity style={profileStyles.shareIconContainer} onPress={handleShare}>
-                <Icon name="share-social" size={30} color="white" />
-            </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+            <ImageBackground
+                source={require('../assets/fondo3.jpg')}
+                style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+                resizeMode="cover"
+            >
+                <View style={{ flex: 1, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity style={profileStyles.shareIconContainer} onPress={handleShare}>
+                        <Icon name="share-social" size={30} color="white" />
+                    </TouchableOpacity>
 
-            <View style={profileStyles.tabContainer}>
-                <TouchableOpacity
-                    style={[profileStyles.tab, activeTab === 'tree' ? profileStyles.activeTab : null]}
-                    onPress={() => setActiveTab('tree')}
-                >
-                    <Text style={[profileStyles.tabText, activeTab === 'tree' ? profileStyles.activeTabText : null]}>Progreso</Text>
-                </TouchableOpacity>
+                    <View style={profileStyles.tabContainer}>
+                        <TouchableOpacity
+                            style={[profileStyles.tab, activeTab === 'tree' ? profileStyles.activeTab : null]}
+                            onPress={() => setActiveTab('tree')}
+                        >
+                            <Text style={[profileStyles.tabText, activeTab === 'tree' ? profileStyles.activeTabText : null]}>Progreso</Text>
+                        </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[profileStyles.tab, activeTab === 'info' ? profileStyles.activeTab : null]}
-                    onPress={() => setActiveTab('info')}
-                >
-                    <Text style={[profileStyles.tabText, activeTab === 'info' ? profileStyles.activeTabText : null]}>Info</Text>
-                </TouchableOpacity>
-            </View>
-            
-            {activeTab === 'info' ? <InfoProgressScreen /> : <TreeProgressScreen />}
-
-
+                        <TouchableOpacity
+                            style={[profileStyles.tab, activeTab === 'info' ? profileStyles.activeTab : null]}
+                            onPress={() => setActiveTab('info')}
+                        >
+                            <Text style={[profileStyles.tabText, activeTab === 'info' ? profileStyles.activeTabText : null]}>Info</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {activeTab === 'info' ? <InfoProgressScreen /> : <TreeProgressScreen />}
+                </View>
+            </ImageBackground>
             <FooterScreen />
-        </ImageBackground>
+        </View>
     );
 };
 
