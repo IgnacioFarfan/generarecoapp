@@ -54,7 +54,14 @@ export default function SignInScreen() {
     // Check for existing token on app start
     useEffect(() => {
         checkLoginStatus();
-        setLocalVersion(Constants.manifest.version || 'dev');
+        // Use Constants.expoConfig.version for SDK 49+ or fallback to manifest?.version for older SDKs
+        let version = 'dev';
+        if (Constants.expoConfig && Constants.expoConfig.version) {
+            version = Constants.expoConfig.version;
+        } else if (Constants.manifest && Constants.manifest.version) {
+            version = Constants.manifest.version;
+        }
+        setLocalVersion(version);
         fetchLatestVersion();
     }, []);
 
