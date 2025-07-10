@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, Alert, StatusBar, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, Image, Alert, StatusBar, ActivityIndicator, Linking, BackHandler } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+
+// import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 // import NetInfo from '@react-native-community/netinfo';
@@ -14,11 +16,17 @@ import apiService from '../services/api.service';
 
 //appStyles
 import { appStyles } from '../styles/appStyles';
+import Constants from 'expo-constants';
 
 // WebBrowser.maybeCompleteAuthSession();
 
+// Version info
+const REMOTE_VERSION_URL = 'https://drive.google.com/uc?export=download&id=1vCgkqc3rHmOs7EuGP5FxlSgcPjrsoq__';
+const APK_URL = 'https://drive.google.com/file/d/1YwNhz7PuP3QIXZmFWYmBfT2WDM4Z1yPB/view?usp=drive_link';
+const LOCAL_VERSION_PATH = FileSystem.documentDirectory + 'version.txt';
+
 export default function SignInScreen() {
-    const navigation = useNavigation();
+    // const navigation = useNavigation();
 
     //const [debugMode, setDebugMode] = useState(false);
 
@@ -39,10 +47,37 @@ export default function SignInScreen() {
     const [lastNameIsValid, setLastNameIsValid] = useState(true);
     const [emailIsValid, setEmailIsValid] = useState(true);
 
+    const [localVersion, setLocalVersion] = useState('dev');
+    const [latestVersion, setLatestVersion] = useState(null);
+    const [showUpdateWarning, setShowUpdateWarning] = useState(false);
+
     // Check for existing token on app start
     useEffect(() => {
         checkLoginStatus();
+        fetchLocalVersion();
+        fetchLatestVersion();
     }, []);
+
+    useEffect(() => {
+        if (showUpdateWarning) {
+            Alert.alert(
+                '¡Nueva versión disponible!',
+                `Actual: ${localVersion}\nÚltima: ${latestVersion}`,
+                [
+                    {
+                        text: 'Descargar última versión',
+                        onPress: () => Linking.openURL(APK_URL),
+                    },
+                    {
+                        text: 'Cerrar app',
+                        onPress: () => BackHandler.exitApp(),
+                        style: 'destructive',
+                    },
+                ],
+                { cancelable: false }
+            );
+        }
+    }, [showUpdateWarning]);
 
     const checkLoginStatus = async () => {
         try {
@@ -242,6 +277,36 @@ export default function SignInScreen() {
         navigation.navigate('PasswordRestoration');
     }
 
+    const fetchLocalVersion = async () => {
+        try {
+            // Try to read version.txt from app folder (bundled)
+            const localVersionAsset = require('../version.txt');
+            setLocalVersion(localVersionAsset.default || localVersionAsset || 'dev');
+        } catch (e) {
+            // fallback: try to read from FileSystem (if ever updated at runtime)
+            try {
+                const version = await FileSystem.readAsStringAsync(LOCAL_VERSION_PATH);
+                setLocalVersion(version.trim());
+            } catch {
+                setLocalVersion('dev');
+            }
+        }
+    };
+
+    const fetchLatestVersion = async () => {
+        try {
+            const response = await fetch(REMOTE_VERSION_URL);
+            const text = await response.text();
+            const remoteVersion = text.trim();
+            setLatestVersion(remoteVersion);
+            if (remoteVersion && remoteVersion !== localVersion) {
+                setShowUpdateWarning(true);
+            }
+        } catch (e) {
+            setLatestVersion(null);
+        }
+    };
+
     return (
         <>
             <StatusBar translucent={true} barStyle="light-content" backgroundColor="transparent" />
@@ -405,6 +470,12 @@ export default function SignInScreen() {
                             <Text style={appStyles.createAccountLink}>Restáurala aquí</Text>
                         </TouchableOpacity>
                     </View>}
+
+                    <View style={{ alignItems: 'center', marginBottom: 10 }}>
+                        <Text style={{ color: '#aaa', fontSize: 12 }}>
+                            Versión actual: {localVersion} {latestVersion && `(Última: ${latestVersion})`}
+                        </Text>
+                    </View>
                 </View>
             }
         </>

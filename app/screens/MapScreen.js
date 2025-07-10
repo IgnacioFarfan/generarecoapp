@@ -8,7 +8,6 @@ import Geolocation from '@react-native-community/geolocation';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { tips } from '../content/mapFitnessTips'
-// import LinearGradient from 'react-native-linear-gradient'; // Removed
 import { mapScreenStyles } from '../styles/mapScreenStyles';
 import { customNightMap } from '../styles/customMapStyle';
 

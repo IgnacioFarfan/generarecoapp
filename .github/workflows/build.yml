@@ -23,6 +23,8 @@ jobs:
         run: cd app && npm ci
       - name: Install EAS CLI
         run: npm install -g eas-cli
+      - name: Write version.txt with commit hash
+        run: echo "$(git rev-parse --short HEAD)" > app/version.txt
       - name: Run build_dev.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -49,6 +51,8 @@ jobs:
         run: cd app && npm ci
       - name: Install EAS CLI
         run: npm install -g eas-cli
+      - name: Write version.txt with commit hash
+        run: echo "$(git rev-parse --short HEAD)" > app/version.txt
       - name: Run build_preview.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -78,6 +82,10 @@ jobs:
       - name: Get commit hash
         id: get_commit
         run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Create version.txt with commit hash
+        run: echo "$commit_hash" > version.txt
+        env:
+          commit_hash: ${{ env.commit_hash }}
       - name: Create Tag
         run: |
           git config user.name "github-actions"
@@ -113,3 +121,4 @@ jobs:
         run: |
           rclone --config=rclone.conf copy devbuild.apk drive:/geapp/
           rclone --config=rclone.conf copy previewbuild.apk drive:/geapp/
+          rclone --config=rclone.conf copy version.txt drive:/geapp/
