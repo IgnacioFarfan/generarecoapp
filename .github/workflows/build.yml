@@ -24,7 +24,9 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Write version.txt with commit hash
-        run: echo "$(git rev-parse --short HEAD)" > app/version.txt
+        run: |
+          mkdir -p app/assets
+          echo "$(git rev-parse --short HEAD)" > app/assets/version.txt
       - name: Run build_dev.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -52,7 +54,9 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
       - name: Write version.txt with commit hash
-        run: echo "$(git rev-parse --short HEAD)" > app/version.txt
+        run: |
+          mkdir -p app/assets
+          echo "$(git rev-parse --short HEAD)" > app/assets/version.txt
       - name: Run build_preview.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

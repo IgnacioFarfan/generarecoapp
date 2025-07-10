@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, StatusBar, ActivityIndicator, Linking, BackHandler } from 'react-native';
 import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
 
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -69,8 +70,8 @@ export default function SignInScreen() {
                         onPress: () => Linking.openURL(APK_URL),
                     },
                     {
-                        text: 'Cerrar', // Changed from 'Cerrar app'
-                        onPress: () => setShowUpdateWarning(false), // Now closes dialog
+                        text: 'Cerrar', 
+                        onPress: () => setShowUpdateWarning(false), 
                         style: 'cancel',
                     },
                 ],
@@ -279,10 +280,12 @@ export default function SignInScreen() {
 
     const fetchLocalVersion = async () => {
         try {
-            // Only try to read from FileSystem (do not use require for text files)
-            const version = await FileSystem.readAsStringAsync(LOCAL_VERSION_PATH);
+            // Load version.txt as an asset
+            const asset = Asset.fromModule(require('../assets/version.txt'));
+            await asset.downloadAsync();
+            const version = await FileSystem.readAsStringAsync(asset.localUri || asset.uri);
             setLocalVersion(version.trim());
-        } catch {
+        } catch (e) {
             setLocalVersion('dev');
         }
     };
