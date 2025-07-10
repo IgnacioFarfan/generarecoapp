@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, StatusBar, ActivityIndicator, Linking, BackHandler } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 
-// import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 // import NetInfo from '@react-native-community/netinfo';
@@ -26,7 +26,7 @@ const APK_URL = 'https://drive.google.com/file/d/1YwNhz7PuP3QIXZmFWYmBfT2WDM4Z1y
 const LOCAL_VERSION_PATH = FileSystem.documentDirectory + 'version.txt';
 
 export default function SignInScreen() {
-    // const navigation = useNavigation();
+    const navigation = useNavigation();
 
     //const [debugMode, setDebugMode] = useState(false);
 
