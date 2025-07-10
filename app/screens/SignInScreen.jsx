@@ -69,9 +69,9 @@ export default function SignInScreen() {
                         onPress: () => Linking.openURL(APK_URL),
                     },
                     {
-                        text: 'Cerrar app',
-                        onPress: () => BackHandler.exitApp(),
-                        style: 'destructive',
+                        text: 'Cerrar', // Changed from 'Cerrar app'
+                        onPress: () => setShowUpdateWarning(false), // Now closes dialog
+                        style: 'cancel',
                     },
                 ],
                 { cancelable: false }
@@ -279,17 +279,11 @@ export default function SignInScreen() {
 
     const fetchLocalVersion = async () => {
         try {
-            // Try to read version.txt from app folder (bundled)
-            const localVersionAsset = require('../version.txt');
-            setLocalVersion(localVersionAsset.default || localVersionAsset || 'dev');
-        } catch (e) {
-            // fallback: try to read from FileSystem (if ever updated at runtime)
-            try {
-                const version = await FileSystem.readAsStringAsync(LOCAL_VERSION_PATH);
-                setLocalVersion(version.trim());
-            } catch {
-                setLocalVersion('dev');
-            }
+            // Only try to read from FileSystem (do not use require for text files)
+            const version = await FileSystem.readAsStringAsync(LOCAL_VERSION_PATH);
+            setLocalVersion(version.trim());
+        } catch {
+            setLocalVersion('dev');
         }
     };
 
