@@ -23,10 +23,10 @@ jobs:
         run: cd app && npm ci
       - name: Install EAS CLI
         run: npm install -g eas-cli
-      - name: Write version.txt with commit hash
+      - name: Update app.json version with commit hash
         run: |
-          mkdir -p app/assets
-          echo "$(git rev-parse --short HEAD)" > app/assets/version.txt
+          commit_hash=$(git rev-parse --short HEAD)
+          jq --arg v "$commit_hash" '.version = $v' app/app.json > app/app.json.tmp && mv app/app.json.tmp app/app.json
       - name: Run build_dev.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -53,10 +53,10 @@ jobs:
         run: cd app && npm ci
       - name: Install EAS CLI
         run: npm install -g eas-cli
-      - name: Write version.txt with commit hash
+      - name: Update app.json version with commit hash
         run: |
-          mkdir -p app/assets
-          echo "$(git rev-parse --short HEAD)" > app/assets/version.txt
+          commit_hash=$(git rev-parse --short HEAD)
+          jq --arg v "$commit_hash" '.version = $v' app/app.json > app/app.json.tmp && mv app/app.json.tmp app/app.json
       - name: Run build_preview.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

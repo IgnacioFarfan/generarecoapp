@@ -24,7 +24,6 @@ import Constants from 'expo-constants';
 // Version info
 const REMOTE_VERSION_URL = 'https://drive.google.com/uc?export=download&id=1vCgkqc3rHmOs7EuGP5FxlSgcPjrsoq__';
 const APK_URL = 'https://drive.google.com/file/d/1YwNhz7PuP3QIXZmFWYmBfT2WDM4Z1yPB/view?usp=drive_link';
-const LOCAL_VERSION_PATH = FileSystem.documentDirectory + 'version.txt';
 
 export default function SignInScreen() {
     const navigation = useNavigation();
@@ -55,7 +54,7 @@ export default function SignInScreen() {
     // Check for existing token on app start
     useEffect(() => {
         checkLoginStatus();
-        fetchLocalVersion();
+        setLocalVersion(Constants.manifest.version || 'dev');
         fetchLatestVersion();
     }, []);
 
@@ -277,18 +276,6 @@ export default function SignInScreen() {
     const handlePassRestoration = () => {
         navigation.navigate('PasswordRestoration');
     }
-
-    const fetchLocalVersion = async () => {
-        try {
-            // Load version.txt as an asset
-            const asset = Asset.fromModule(require('../assets/version.txt'));
-            await asset.downloadAsync();
-            const version = await FileSystem.readAsStringAsync(asset.localUri || asset.uri);
-            setLocalVersion(version.trim());
-        } catch (e) {
-            setLocalVersion('dev');
-        }
-    };
 
     const fetchLatestVersion = async () => {
         try {
