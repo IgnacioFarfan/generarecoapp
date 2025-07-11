@@ -26,7 +26,7 @@ jobs:
       - name: Update app.json version with commit hash
         run: |
           commit_hash=$(git rev-parse --short HEAD)
-          jq --arg v "$commit_hash" '.version = $v' app/app.json > app/app.json.tmp && mv app/app.json.tmp app/app.json
+          jq --arg v "$commit_hash" '.expo.version = $v' app/app.json > app/app.json.tmp && mv app/app.json.tmp app/app.json
       - name: Run build_dev.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
       - name: Update app.json version with commit hash
         run: |
           commit_hash=$(git rev-parse --short HEAD)
-          jq --arg v "$commit_hash" '.version = $v' app/app.json > app/app.json.tmp && mv app/app.json.tmp app/app.json
+          jq --arg v "$commit_hash" '.expo.version = $v' app/app.json > app/app.json.tmp && mv app/app.json.tmp app/app.json
       - name: Run build_preview.sh
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
