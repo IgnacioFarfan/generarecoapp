@@ -221,9 +221,9 @@ export default function SignInScreen() {
 
             //Simple validation reg ex that requires 1-15 alphanumeric characters
             const userNameRegex = /^([a-zA-Z0-9]{1,15})$/
-            //Validates a strong password. It must be between 4 and 6 characters, contain at least one digit and one alphabetic character, 
+            // Validates a strong password. It must be between 8 and 32 characters, contain at least one digit and one alphabetic character, 
             // and must not contain special characters
-            const passwordRegex = /(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{4,6})$/
+            const passwordRegex = /(?!^[0-9]*$)(?!^[a-zA-Z]*$)^([a-zA-Z0-9]{8,32})$/
             // Person's name (first, last, or both) in any letter case. Although not perfect, this expression will filter out many incorrect 
             // name formats (especially numerics and invalid special characters).
             const firstNameRegex = /^[a-zA-Z]+(([\'\,\.\- ][a-zA-Z ])?[a-zA-Z]*)*$/
@@ -372,7 +372,7 @@ export default function SignInScreen() {
                                 onChangeText={setPassword}
                             />
                             {!passwordIsValid && (
-                                <Text style={appStyles.errorText}>Por favor ingresa entre 4 y 6 carácteres alfanuméricos (al menos una letra y un número). No uses carácteres especiales.</Text>
+                                <Text style={appStyles.errorText}>Por favor ingresa entre 8 y 32 carácteres alfanuméricos (al menos una letra y un número). No uses carácteres especiales.</Text>
                             )}
                             <TextInput
                                 style={appStyles.input}
@@ -418,7 +418,7 @@ export default function SignInScreen() {
                                 onChangeText={setPassword}
                             />
                             {!passwordIsValid && (
-                                <Text style={appStyles.errorText}>Por favor ingresa entre 4 y 6 carácteres alfanuméricos (al menos una letra y un número). No uses carácteres especiales.</Text>
+                                <Text style={appStyles.errorText}>Por favor ingresa entre 8 y 32 carácteres alfanuméricos (al menos una letra y un número). No uses carácteres especiales.</Text>
                             )}
 
                             <TouchableOpacity
